@@ -1,0 +1,16 @@
+{
+  "title": "weatherlink",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connect to WeatherLink / AirLink",
+        "data": {
+          "host": "Host"
+        }
+      }
+    },
+    "error": {
+      "connect_failed": "Failed to connect"
+    }
+  }
+}

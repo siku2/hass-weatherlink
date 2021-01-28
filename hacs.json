@@ -1,0 +1,10 @@
+{
+  "name": "WeatherLink",
+  "render_readme": true,
+  "domains": [
+    "air_quality",
+    "sensor",
+    "weather"
+  ],
+  "iot_class": "Local Polling"
+}

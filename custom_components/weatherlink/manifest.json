@@ -1,0 +1,14 @@
+{
+  "domain": "weatherlink",
+  "name": "WeatherLink",
+  "codeowners": [
+    "@siku2"
+  ],
+  "config_flow": true,
+  "dependencies": [],
+  "requirements": [],
+  "zeroconf": [
+    "_airlink._tcp.local.",
+    "_weatherlinklive._tcp.local."
+  ]
+}
