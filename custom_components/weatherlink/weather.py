@@ -3,7 +3,7 @@ import logging
 from homeassistant.components.weather import WeatherEntity
 
 from . import WeatherLinkCoordinator, WeatherLinkEntity
-from .api import IssCondition
+from .api import IssCondition, LssBarCondition
 from .const import DOMAIN
 
 logger = logging.getLogger(__name__)
@@ -31,6 +31,13 @@ class Weather(WeatherEntity, WeatherLinkEntity):
         return "°C"
 
     @property
+    def pressure(self):
+        if condition := self._conditions.get(LssBarCondition):
+            return round(condition.bar_sea_level, 1)
+
+        return None
+
+    @property
     def humidity(self):
         return self._iss_condition.hum
 
@@ -45,4 +52,4 @@ class Weather(WeatherEntity, WeatherLinkEntity):
     @property
     def condition(self):
         # TODO: determine this
-        return "fog"
+        return "unknown"

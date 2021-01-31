@@ -26,9 +26,19 @@ class WeatherLinkCoordinator(DataUpdateCoordinator):
     session: WeatherLinkSession
     current_conditions: CurrentConditions
 
-    async def __initalize(self) -> None:
+    device_did: str
+    device_name: str
+    device_model_name: str
+
+    async def __initalize(self, session: WeatherLinkSession) -> None:
+        self.session = session
         self.update_method = self.__fetch_data
         await self.__fetch_data()
+
+        conditions = self.current_conditions
+        self.device_did = conditions.did
+        self.device_model_name = conditions.determine_device_type().value
+        self.device_name = conditions.determine_device_name()
 
     async def __fetch_data(self) -> None:
         self.current_conditions = await self.session.current_conditions()
@@ -41,8 +51,7 @@ class WeatherLinkCoordinator(DataUpdateCoordinator):
             name="state",
             update_interval=timedelta(seconds=10),
         )
-        coordinator.session = session
-        await coordinator.__initalize()
+        await coordinator.__initalize(session)
 
         return coordinator
 
@@ -77,16 +86,9 @@ async def async_unload_entry(hass, entry):
 
 class WeatherLinkEntity(CoordinatorEntity):
     coordinator: WeatherLinkCoordinator
-    _did: str
-    _model: str
-    _name: str
 
     def __init__(self, coordinator: WeatherLinkCoordinator) -> None:
         super().__init__(coordinator)
-
-        self._did = coordinator.current_conditions.did
-        self._model = coordinator.current_conditions.determine_device_type().value
-        self._name = coordinator.current_conditions.name or self._model
 
     @property
     def _conditions(self) -> CurrentConditions:
@@ -94,18 +96,19 @@ class WeatherLinkEntity(CoordinatorEntity):
 
     @property
     def device_info(self):
+        coord = self.coordinator
         return {
-            "identifiers": {(DOMAIN, self._did)},
-            "name": self._name,
+            "identifiers": {(DOMAIN, coord.device_did)},
+            "name": coord.device_name,
             "manufacturer": "Davis Instruments",
-            "model": self._model,
+            "model": coord.device_model_name,
             "sw_version": "v1",
         }
 
     @property
     def name(self):
-        return self._name
+        return self.coordinator.device_name
 
     @property
     def unique_id(self):
-        return f"{DOMAIN}-{self._did}-{type(self).__qualname__}"
+        return f"{DOMAIN}-{self.coordinator.device_did}-{type(self).__qualname__}"

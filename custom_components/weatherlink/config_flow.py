@@ -1,6 +1,6 @@
 import dataclasses
 import logging
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 import voluptuous as vol
 from homeassistant import config_entries
@@ -23,8 +23,6 @@ class FormError(Exception):
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     async def discover(self, host: str) -> dict:
         logger.info("discovering: %s", host)
-        await self.async_set_unique_id(host)
-        self._abort_if_unique_id_configured()
 
         session = aiohttp_client.async_get_clientsession(self.hass)
         session = WeatherLinkSession(session, host)
@@ -34,7 +32,10 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             logger.exception(f"failed to connect to {host!r}")
             raise FormError("host", "connect_failed")
 
-        title = conditions.name or host
+        await self.async_set_unique_id(conditions.did)
+        self._abort_if_unique_id_configured()
+
+        title = conditions.determine_device_name()
         return self.async_create_entry(title=title, data={"host": host})
 
     async def async_step_user(self, info):
@@ -70,5 +71,8 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             return self.discovery_data
 
         return self.async_show_form(
-            step_id="zeroconf_confirm", data_schema=vol.Schema({"title": str})
+            step_id="zeroconf_confirm",
+            data_schema=vol.Schema(
+                {vol.Optional("title", default=self.discovery_data["title"]): str}
+            ),
         )

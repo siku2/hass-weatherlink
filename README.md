@@ -1,6 +1,16 @@
 # Home Assistant WeatherLink
 
-Requires Python 3.8
+[![HACS](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
+![Python 3.8](https://img.shields.io/badge/python-3.8-blue)
+
+A custom component for Davis Instruments' [WeatherLink](https://www.davisinstruments.com/weatherlinklive/) and [AirLink](https://www.davisinstruments.com/airlink/) stations.
+
+## Missing features
+
+The following features haven't been implemented yet.
+Feel free to open an issue if you require one of them.
+
+- Moisture sensor
 
 ## AirLink
 

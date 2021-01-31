@@ -58,6 +58,33 @@ class ReceiverState(enum.IntEnum):
     """Transmitter has not been acquired yet, or we’ve lost it (more than 15 missed packets in a row)."""
 
 
+class CollectorSize(enum.IntEnum):
+    Millimeter01 = 3
+    """0.1 mm"""
+    Millimeter02 = 2
+    """0.2 mm"""
+
+    Inches001 = 1
+    """(0.01")"""
+    Inches0001 = 4
+    """(0.001")"""
+
+    def __mul__(self, x: int) -> int:
+        return x * self.to_mm()
+
+    def to_mm(self) -> float:
+        return _COLLECTOR2MM[self]
+
+
+_IN2MM = 25.4
+_COLLECTOR2MM = {
+    CollectorSize.Millimeter01: 0.1,
+    CollectorSize.Millimeter02: 0.2,
+    CollectorSize.Inches001: 0.01 * _IN2MM,
+    CollectorSize.Inches0001: 0.001 * _IN2MM,
+}
+
+
 @dataclasses.dataclass()
 class ConditionRecord(FromJson, abc.ABC):
     lsid: Optional[int]
@@ -88,58 +115,65 @@ class IssCondition(ConditionRecord):
     thsw_index: float
     """"""
 
-    wind_speed_last: int
-    """most recent valid wind speed **(mph)**"""
+    wind_speed_last: float
+    """most recent valid wind speed **(km/h)**"""
     wind_dir_last: Optional[int]
     """most recent valid wind direction **(°degree)**"""
 
-    wind_speed_avg_last_1_min: int
-    """average wind speed over last 1 min **(mph)**"""
+    wind_speed_avg_last_1_min: float
+    """average wind speed over last 1 min **(km/h)**"""
     wind_dir_scalar_avg_last_1_min: int
     """scalar average wind direction over last 1 min **(°degree)**"""
 
-    wind_speed_avg_last_2_min: int
-    """average wind speed over last 2 min **(mph)**"""
+    wind_speed_avg_last_2_min: float
+    """average wind speed over last 2 min **(km/h)**"""
     wind_dir_scalar_avg_last_2_min: float
     """scalar average wind direction over last 2 min **(°degree)**"""
 
-    wind_speed_hi_last_2_min: int
-    """maximum wind speed over last 2 min **(mph)**"""
+    wind_speed_hi_last_2_min: float
+    """maximum wind speed over last 2 min **(km/h)**"""
     wind_dir_at_hi_speed_last_2_min: float
     """gust wind direction over last 2 min **(°degree)**"""
 
-    wind_speed_avg_last_10_min: int
-    """average wind speed over last 10 min **(mph)**"""
+    wind_speed_avg_last_10_min: float
+    """average wind speed over last 10 min **(km/h)**"""
     wind_dir_scalar_avg_last_10_min: float
     """scalar average wind direction over last 10 min **(°degree)**"""
 
-    wind_speed_hi_last_10_min: int
-    """maximum wind speed over last 10 min **(mph)**"""
+    wind_speed_hi_last_10_min: float
+    """maximum wind speed over last 10 min **(km/h)**"""
     wind_dir_at_hi_speed_last_10_min: float
     """gust wind direction over last 10 min **(°degree)**"""
 
-    rain_size: int
-    """rain collector type/size **(0: Reserved, 1:  float", 2:  float mm, 3:   float mm, 4:  float")**"""
+    rain_size: CollectorSize
+    """rain collector type/size"""
 
-    rain_rate_last: int
+    rain_rate_last: float
+    rain_rate_last_counts: int
     """most recent valid rain rate **(counts/hour)**"""
-    rain_rate_hi: Optional[int]  # ?
+    rain_rate_hi: Optional[float]
+    rain_rate_hi_counts: Optional[int]
     """highest rain rate over last 1 min **(counts/hour)**"""
 
-    rainfall_last_15_min: Optional[int]
+    rainfall_last_15_min: Optional[float]
+    rainfall_last_15_min_counts: Optional[int]
     """total rain count over last 15 min **(counts)**"""
-    rain_rate_hi_last_15_min: int
+    rain_rate_hi_last_15_min: float
+    rain_rate_hi_last_15_min_counts: int
     """highest rain rate over last 15 min **(counts/hour)**"""
 
-    rainfall_last_60_min: Optional[int]
+    rainfall_last_60_min: Optional[float]
+    rainfall_last_60_min_counts: Optional[int]
     """total rain count for last 60 min **(counts)**"""
-    rainfall_last_24_hr: Optional[int]
+    rainfall_last_24_hr: Optional[float]
+    rainfall_last_24_hr_counts: Optional[int]
     """total rain count for last 24 hours **(counts)**"""
 
-    rain_storm: Optional[int]
+    rain_storm: Optional[float]
+    rain_storm_counts: Optional[int]
     """total rain count since last 24 hour long break in rain **(counts)**"""
     rain_storm_start_at: Optional[datetime]
-    """timestamp of current rain storm start **(seconds)**"""
+    """timestamp of current rain storm start"""
 
     solar_rad: int
     """most recent solar radiation **(W/m²)**"""
@@ -149,14 +183,18 @@ class IssCondition(ConditionRecord):
     trans_battery_flag: int
     """transmitter battery status flag"""
 
-    rainfall_daily: int
+    rainfall_daily: float
+    rainfall_daily_counts: int
     """total rain count since local midnight **(counts)**"""
-    rainfall_monthly: int
+    rainfall_monthly: float
+    rainfall_monthly_counts: int
     """total rain count since first of month at local midnight **(counts)**"""
-    rainfall_year: int
+    rainfall_year: float
+    rainfall_year_counts: int
     """total rain count since first of user-chosen month at local midnight **(counts)**"""
 
-    rain_storm_last: Optional[int]
+    rain_storm_last: Optional[float]
+    rain_storm_last_counts: Optional[int]
     """total rain count since last 24 hour long break in rain **(counts)**"""
     rain_storm_last_start_at: Optional[datetime]
     """timestamp of last rain storm start **(sec)**"""
@@ -165,6 +203,23 @@ class IssCondition(ConditionRecord):
 
     @classmethod
     def _from_json(cls, data: JsonObject, **kwargs):
+        collector = CollectorSize(data["rain_size"])
+        data["rain_size"] = collector
+        json_keys_counts_to_mm(
+            data,
+            collector,
+            "rain_rate_last",
+            "rain_rate_hi",
+            "rainfall_last_15_min",
+            "rain_rate_hi_last_15_min",
+            "rainfall_last_60_min",
+            "rainfall_last_24_hr",
+            "rain_storm",
+            "rainfall_daily",
+            "rainfall_monthly",
+            "rainfall_year",
+            "rain_storm_last",
+        )
         json_apply_converters(data, rx_state=ReceiverState)
         json_keys_to_celsius(
             data,
@@ -181,6 +236,15 @@ class IssCondition(ConditionRecord):
             "rain_storm_start_at",
             "rain_storm_last_start_at",
             "rain_storm_last_end_at",
+        )
+        json_keys_to_kph(
+            data,
+            "wind_speed_last",
+            "wind_speed_avg_last_1_min",
+            "wind_speed_avg_last_2_min",
+            "wind_speed_hi_last_2_min",
+            "wind_speed_avg_last_10_min",
+            "wind_speed_hi_last_10_min",
         )
         return cls(**data)
 
@@ -227,14 +291,15 @@ class MoistureCondition(ConditionRecord):
 @dataclasses.dataclass()
 class LssBarCondition(ConditionRecord):
     bar_sea_level: float
-    """most recent bar sensor reading with elevation adjustment **(inches)**"""
+    """most recent bar sensor reading with elevation adjustment **(hpa)**"""
     bar_trend: Optional[float]
-    """current 3 hour bar trend **(inches)**"""
+    """current 3 hour bar trend **(hpa)**"""
     bar_absolute: float
-    """raw bar sensor reading **(inches)**"""
+    """raw bar sensor reading **(hpa)**"""
 
     @classmethod
     def _from_json(cls, data: JsonObject, **kwargs):
+        json_keys_to_hpa(data, "bar_sea_level", "bar_trend", "bar_absolute")
         return cls(**data)
 
 
@@ -406,6 +471,14 @@ class CurrentConditions(FromJson, Mapping[Type[RecordT], RecordT]):
         else:
             return DeviceType.AirLink
 
+    def determine_device_name(self) -> str:
+        name = self.name
+        if name:
+            return name
+
+        model_name = self.determine_device_type().name
+        return f"{model_name} {self.did}"
+
 
 @dataclasses.dataclass()
 class ApiError(Exception, FromJson):
@@ -448,7 +521,18 @@ class WeatherLinkSession:
 
 
 def fahrenheit_to_celsius(value: float) -> float:
-    return (value - 32) * 5 / 9
+    c = (value - 32) * 5 / 9
+    return round(c, 3)
+
+
+def mph_to_kph(value: float) -> float:
+    kph = 1.60934 * value
+    return round(kph, 3)
+
+
+def in_hg_to_hpa(value: float) -> float:
+    hpa = 33.86389 * value
+    return round(hpa, 3)
 
 
 def json_apply_converters(d: JsonObject, **converters: Callable[[Any], Any]) -> None:
@@ -470,6 +554,22 @@ def json_keys_to_datetime(d: JsonObject, *keys: str) -> None:
 
 def json_keys_to_celsius(d: JsonObject, *keys: str) -> None:
     json_apply_converters(d, **{key: fahrenheit_to_celsius for key in keys})
+
+
+def json_keys_to_kph(d: JsonObject, *keys: str) -> None:
+    json_apply_converters(d, **{key: mph_to_kph for key in keys})
+
+
+def json_keys_to_hpa(d: JsonObject, *keys: str) -> None:
+    json_apply_converters(d, **{key: in_hg_to_hpa for key in keys})
+
+
+def json_keys_counts_to_mm(d: JsonObject, collector: CollectorSize, *keys: str):
+    for key in keys:
+        counts = d.get(key)
+        d[f"{key}_counts"] = counts
+        if counts:
+            d[key] = collector * counts
 
 
 def json_set_default_none(d: JsonObject, *keys: str) -> None:

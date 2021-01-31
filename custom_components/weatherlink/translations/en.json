@@ -7,6 +7,12 @@
         "data": {
           "host": "Host"
         }
+      },
+      "zeroconf_confirm": {
+        "title": "Setup WeatherLink / AirLink device",
+        "data": {
+          "title": "Title"
+        }
       }
     },
     "error": {
