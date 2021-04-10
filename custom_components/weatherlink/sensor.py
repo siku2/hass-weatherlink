@@ -97,11 +97,11 @@ class Wind(
         condition = self._iss_condition
         return {
             "high": condition.wind_speed_hi_last_2_min,
-            "dir": condition.wind_dir_last,
+            "dir": condition.wind_dir_scalar_avg_last_2_min,
             "wind_chill": condition.wind_chill,
             "10_min": condition.wind_speed_avg_last_10_min,
             "10_min_dir": condition.wind_dir_scalar_avg_last_10_min,
-            "10_min_high": condition.wind_speed_avg_last_10_min,
+            "10_min_high": condition.wind_speed_hi_last_10_min,
             "10_min_high_dir": condition.wind_dir_at_hi_speed_last_10_min,
         }
 
