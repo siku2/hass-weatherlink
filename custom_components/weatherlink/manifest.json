@@ -1,6 +1,7 @@
 {
   "domain": "weatherlink",
   "name": "WeatherLink",
+  "version": "0.1.2",
   "codeowners": [
     "@siku2"
   ],
