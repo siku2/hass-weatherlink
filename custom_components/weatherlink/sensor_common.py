@@ -34,9 +34,10 @@ class WeatherLinkSensor(WeatherLinkEntity):
 
     def __init_subclass__(
         cls,
+        abc: bool = False,
         **kwargs,
     ) -> None:
-        if kwargs.pop("abc", False):
+        if abc:
             super().__init_subclass__(**kwargs)
             return
 

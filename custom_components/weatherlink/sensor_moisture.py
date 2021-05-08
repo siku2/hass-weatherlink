@@ -15,9 +15,12 @@ __all__ = [
 class MoistureSensor(WeatherLinkSensor, abc=True):
     def __init_subclass__(
         cls,
+        abc: bool = False,
         **kwargs,
     ) -> None:
-        super().__init_subclass__(required_conditions=(MoistureCondition,), **kwargs)
+        if not abc:
+            kwargs["required_conditions"] = (MoistureCondition,)
+        super().__init_subclass__(**kwargs)
 
     @property
     def _moisture_condition(self) -> MoistureCondition:

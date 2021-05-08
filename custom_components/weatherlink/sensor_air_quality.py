@@ -7,9 +7,12 @@ __all__ = ["AirQualityStatus"]
 class AirQualitySensor(WeatherLinkSensor, abc=True):
     def __init_subclass__(
         cls,
+        abc: bool = False,
         **kwargs,
     ) -> None:
-        super().__init_subclass__(required_conditions=(AirQualityCondition,), **kwargs)
+        if not abc:
+            kwargs["required_conditions"] = (AirQualityCondition,)
+        super().__init_subclass__(**kwargs)
 
     @property
     def _aq_condition(self) -> AirQualityCondition:
