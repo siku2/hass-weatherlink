@@ -35,10 +35,14 @@ class MoistureSensor(WeatherLinkSensor, abc=True):
 
 class MoistureStatus(
     MoistureSensor,
-    sensor_name="Status",
+    sensor_name="Moisture Status",
     unit_of_measurement=None,
     device_class=None,
 ):
+    @property
+    def icon(self):
+        return "mdi:information"
+
     @property
     def state(self):
         rx_state = self._moisture_condition.rx_state
@@ -83,6 +87,10 @@ class SoilABC(MoistureSensor, abc=True):
     @classmethod
     def _temp(cls, c: MoistureCondition) -> Optional[float]:
         return getattr(c, f"temp_{cls._sensor_id}")
+
+    @property
+    def icon(self):
+        return "mdi:sprout"
 
     @property
     def state(self):
@@ -147,6 +155,10 @@ class LeafABC(MoistureSensor, abc=True):
     @classmethod
     def _wet_leaf(cls, c: MoistureCondition) -> Optional[float]:
         return getattr(c, f"wet_leaf_{cls._sensor_id}")
+
+    @property
+    def icon(self):
+        return "mdi:leaf"
 
     @property
     def state(self):

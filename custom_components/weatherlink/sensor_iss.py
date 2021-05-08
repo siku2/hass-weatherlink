@@ -36,10 +36,14 @@ class IssSensor(WeatherLinkSensor, abc=True):
 
 class IssStatus(
     IssSensor,
-    sensor_name="Status",
+    sensor_name="ISS Status",
     unit_of_measurement=None,
     device_class=None,
 ):
+    @property
+    def icon(self):
+        return "mdi:information"
+
     @property
     def state(self):
         rx_state = self._iss_condition.rx_state
@@ -108,6 +112,10 @@ class WindSpeed(
     device_class=None,
 ):
     @property
+    def icon(self):
+        return "mdi:weather-windy"
+
+    @property
     def state(self):
         return round(self._iss_condition.wind_speed_avg_last_2_min, 1)
 
@@ -127,6 +135,10 @@ class WindBearing(
     unit_of_measurement="°",
     device_class=None,
 ):
+    @property
+    def icon(self):
+        return "mdi:compass-rose"
+
     @property
     def state(self):
         return round(self._iss_condition.wind_dir_scalar_avg_last_2_min, 1)
@@ -148,6 +160,10 @@ class SolarRad(
     device_class=None,
 ):
     @property
+    def icon(self):
+        return "mdi:weather-balance-sunny"
+
+    @property
     def state(self):
         return self._iss_condition.solar_rad
 
@@ -159,6 +175,10 @@ class UvIndex(
     device_class=None,
 ):
     @property
+    def icon(self):
+        return "mdi:shield-sun"
+
+    @property
     def state(self):
         return self._iss_condition.uv_index
 
@@ -169,6 +189,10 @@ class Rainfall(
     unit_of_measurement="mm",
     device_class=None,
 ):
+    @property
+    def icon(self):
+        return "mdi:weather-pouring"
+
     @property
     def state(self):
         return round(self._iss_condition.rainfall_daily, 1)
@@ -194,6 +218,10 @@ class Rainstorm(
     unit_of_measurement="mm",
     device_class=None,
 ):
+    @property
+    def icon(self):
+        return "mdi:weather-lightning-rainy"
+
     @property
     def state(self):
         return round_optional(self._iss_condition.rain_storm, 1)

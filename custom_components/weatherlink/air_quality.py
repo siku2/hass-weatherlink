@@ -23,6 +23,10 @@ class AirQuality(AirQualityEntity, WeatherLinkEntity):
         return self._conditions[AirQualityCondition]
 
     @property
+    def name(self):
+        return self.coordinator.name
+
+    @property
     def particulate_matter_2_5(self) -> float:
         return self._aq_condition.pm_2p5_nowcast
 

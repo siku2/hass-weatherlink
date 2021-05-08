@@ -23,6 +23,10 @@ class Weather(WeatherEntity, WeatherLinkEntity):
         return self._conditions[IssCondition]
 
     @property
+    def name(self):
+        return self.coordinator.name
+
+    @property
     def temperature(self):
         return self._iss_condition.temp
 
