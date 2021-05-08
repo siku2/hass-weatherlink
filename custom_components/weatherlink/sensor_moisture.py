@@ -65,8 +65,8 @@ class SoilABC(MoistureSensor, abc=True):
     def __init_subclass__(cls, *, sensor_id: int, **kwargs) -> None:
         super().__init_subclass__(
             sensor_name=f"Soil {sensor_id}",
-            unit_of_measurement="%",
-            device_class="humidity",
+            unit_of_measurement="cb",
+            device_class=None,
             **kwargs,
         )
 
@@ -137,8 +137,8 @@ class LeafABC(MoistureSensor, abc=True):
     def __init_subclass__(cls, *, sensor_id: int, **kwargs) -> None:
         super().__init_subclass__(
             sensor_name=f"Leaf {sensor_id}",
-            unit_of_measurement="%",
-            device_class="humidity",
+            unit_of_measurement=None,
+            device_class=None,
             **kwargs,
         )
 

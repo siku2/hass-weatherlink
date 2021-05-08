@@ -24,7 +24,7 @@ class AirQuality(AirQualityEntity, WeatherLinkEntity):
 
     @property
     def name(self):
-        return self.coordinator.name
+        return self.coordinator.device_name
 
     @property
     def particulate_matter_2_5(self) -> float:

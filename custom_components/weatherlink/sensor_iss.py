@@ -161,7 +161,7 @@ class SolarRad(
 ):
     @property
     def icon(self):
-        return "mdi:weather-balance-sunny"
+        return "mdi:white-balance-sunny"
 
     @property
     def state(self):

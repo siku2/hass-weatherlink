@@ -24,7 +24,7 @@ class Weather(WeatherEntity, WeatherLinkEntity):
 
     @property
     def name(self):
-        return self.coordinator.name
+        return self.coordinator.device_name
 
     @property
     def temperature(self):
