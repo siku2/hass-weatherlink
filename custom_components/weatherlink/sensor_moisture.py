@@ -1,4 +1,6 @@
-from .api import MoistureCondition
+from typing import Optional
+
+from .api import CurrentConditions, MoistureCondition
 from .sensor_common import WeatherLinkSensor
 
 __all__ = [
@@ -25,10 +27,6 @@ class MoistureSensor(WeatherLinkSensor, abc=True):
     @property
     def _moisture_condition(self) -> MoistureCondition:
         return self._conditions[MoistureCondition]
-
-    @property
-    def name(self):
-        return f"{self.coordinator.device_name} Moisture {self._sensor_name}"
 
     @property
     def unique_id(self):
@@ -70,15 +68,30 @@ class SoilABC(MoistureSensor, abc=True):
 
         cls._sensor_id = sensor_id
 
+    @classmethod
+    def _conditions_ok(cls, conditions: CurrentConditions) -> bool:
+        if not super()._conditions_ok(conditions):
+            return False
+
+        c = conditions[MoistureCondition]
+        return (cls._moist_soil(c) or cls._temp(c)) is not None
+
+    @classmethod
+    def _moist_soil(cls, c: MoistureCondition) -> Optional[float]:
+        return getattr(c, f"moist_soil_{cls._sensor_id}")
+
+    @classmethod
+    def _temp(cls, c: MoistureCondition) -> Optional[float]:
+        return getattr(c, f"temp_{cls._sensor_id}")
+
     @property
     def state(self):
-        return getattr(self._moisture_condition, f"moist_soil_{self._sensor_id}")
+        return self._moist_soil(self._moisture_condition)
 
     @property
     def device_state_attributes(self):
-        c = self._moisture_condition
         return {
-            "temperature": getattr(c, f"temp_{self._sensor_id}"),
+            "temperature": self._temp(self._moisture_condition),
         }
 
 
@@ -110,23 +123,45 @@ class Soil4(
     ...
 
 
-class Leaf1(
-    MoistureSensor,
-    sensor_name="Leaf 1",
-    unit_of_measurement="%",
-    device_class="humidity",
-):
+class LeafABC(MoistureSensor, abc=True):
+    _sensor_id: int
+
+    def __init_subclass__(cls, *, sensor_id: int, **kwargs) -> None:
+        super().__init_subclass__(
+            sensor_name=f"Leaf {sensor_id}",
+            unit_of_measurement="%",
+            device_class="humidity",
+            **kwargs,
+        )
+
+        cls._sensor_id = sensor_id
+
+    @classmethod
+    def _conditions_ok(cls, conditions: CurrentConditions) -> bool:
+        if not super()._conditions_ok(conditions):
+            return False
+
+        c = conditions[MoistureCondition]
+        return cls._wet_leaf(c) is not None
+
+    @classmethod
+    def _wet_leaf(cls, c: MoistureCondition) -> Optional[float]:
+        return getattr(c, f"wet_leaf_{cls._sensor_id}")
+
     @property
     def state(self):
-        return self._moisture_condition.wet_leaf_1
+        return self._wet_leaf(self._moisture_condition)
+
+
+class Leaf1(
+    LeafABC,
+    sensor_id=1,
+):
+    ...
 
 
 class Leaf2(
-    MoistureSensor,
-    sensor_name="Leaf 2",
-    unit_of_measurement="%",
-    device_class="humidity",
+    LeafABC,
+    sensor_id=2,
 ):
-    @property
-    def state(self):
-        return self._moisture_condition.wet_leaf_2
+    ...

@@ -18,13 +18,7 @@ class AirQualitySensor(WeatherLinkSensor, abc=True):
     def _aq_condition(self) -> AirQualityCondition:
         return self._conditions[AirQualityCondition]
 
-    @property
-    def name(self):
-        return f"{self.coordinator.device_name} Air {self._sensor_name}"
-
-    @property
-    def unique_id(self):
-        return f"{super().unique_id}-air_quality"
+    # doesn't need name or unique_id because it's a separate device
 
 
 class AirQualityStatus(

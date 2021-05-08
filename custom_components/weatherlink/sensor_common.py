@@ -80,7 +80,7 @@ class WeatherLinkSensor(WeatherLinkEntity):
 
     @property
     def name(self):
-        return f"{self.coordinator.device_name} {self._sensor_name}"
+        return f"{self.coordinator.device_model_name} {self._sensor_name}"
 
     @property
     def unit_of_measurement(self):

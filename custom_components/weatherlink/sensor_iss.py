@@ -30,10 +30,6 @@ class IssSensor(WeatherLinkSensor, abc=True):
         return self._conditions[IssCondition]
 
     @property
-    def name(self):
-        return f"{self.coordinator.device_name} ISS {self._sensor_name}"
-
-    @property
     def unique_id(self):
         return f"{super().unique_id}-iss"
 
