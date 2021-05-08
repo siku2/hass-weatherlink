@@ -1,5 +1,5 @@
 from .api import AirQualityCondition
-from .sensor_common import WeatherLinkSensor, round_optional
+from .sensor_common import WeatherLinkSensor
 
 __all__ = ["AirQualityStatus"]
 
@@ -43,3 +43,34 @@ class AirQualityStatus(
             "pm_data_24_hr": c.pct_pm_data_last_24_hours,
             "pm_data_nowcast": c.pct_pm_data_nowcast,
         }
+
+
+class Temperature(
+    AirQualitySensor,
+    sensor_name="Temperature",
+    unit_of_measurement="°C",
+    device_class="temperature",
+):
+    @property
+    def state(self):
+        return round(self._aq_condition.temp, 1)
+
+    @property
+    def device_state_attributes(self):
+        c = self._aq_condition
+        return {
+            "dew_point": c.dew_point,
+            "wet_bulb": c.wet_bulb,
+            "heat_index": c.heat_index,
+        }
+
+
+class Humidity(
+    AirQualitySensor,
+    sensor_name="Humidity",
+    unit_of_measurement="%",
+    device_class="humidity",
+):
+    @property
+    def state(self):
+        return round(self._aq_condition.hum, 1)

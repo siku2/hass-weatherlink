@@ -73,6 +73,7 @@ class Temperature(
         return {
             "dew_point": c.dew_point,
             "wet_bulb": c.wet_bulb,
+            "heat_index": c.heat_index,
             "wind_chill": c.wind_chill,
             "thw_index": c.thw_index,
             "thsw_index": c.thsw_index,
@@ -88,17 +89,6 @@ class ThswIndex(
     @property
     def state(self):
         return round(self._iss_condition.thsw_index, 1)
-
-    @property
-    def device_state_attributes(self):
-        c = self._iss_condition
-        return {
-            "dew_point": c.dew_point,
-            "wet_bulb": c.wet_bulb,
-            "wind_chill": c.wind_chill,
-            "thw_index": c.thw_index,
-            "thsw_index": c.thsw_index,
-        }
 
 
 class Humidity(
