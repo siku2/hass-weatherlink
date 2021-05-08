@@ -23,7 +23,7 @@ class IssSensor(WeatherLinkSensor, abc=True):
     ) -> None:
         if not abc:
             kwargs["required_conditions"] = (IssCondition,)
-        super().__init_subclass__(**kwargs)
+        super().__init_subclass__(abc=abc, **kwargs)
 
     @property
     def _iss_condition(self) -> IssCondition:

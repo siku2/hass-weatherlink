@@ -12,7 +12,7 @@ class AirQualitySensor(WeatherLinkSensor, abc=True):
     ) -> None:
         if not abc:
             kwargs["required_conditions"] = (AirQualityCondition,)
-        super().__init_subclass__(**kwargs)
+        super().__init_subclass__(abc=abc, **kwargs)
 
     @property
     def _aq_condition(self) -> AirQualityCondition:
