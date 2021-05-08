@@ -19,20 +19,20 @@ async def async_setup_entry(hass, entry, async_add_entities):
 
 class AirQuality(AirQualityEntity, WeatherLinkEntity):
     @property
-    def _air_quality_condition(self) -> AirQualityCondition:
+    def _aq_condition(self) -> AirQualityCondition:
         return self._conditions[AirQualityCondition]
 
     @property
     def particulate_matter_2_5(self) -> float:
-        return self._air_quality_condition.pm_2p5_nowcast
+        return self._aq_condition.pm_2p5_nowcast
 
     @property
     def particulate_matter_10(self) -> float:
-        return self._air_quality_condition.pm_10_nowcast
+        return self._aq_condition.pm_10_nowcast
 
     @property
     def particulate_matter_0_1(self) -> float:
-        return self._air_quality_condition.pm_1
+        return self._aq_condition.pm_1
 
     # TODO calculate AQI
     # @property

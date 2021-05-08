@@ -278,7 +278,7 @@ class MoistureCondition(ConditionRecord):
     wet_leaf_2: Optional[float]
     """most recent valid leaf wetness slot 2"""
 
-    trans_battery_flag: Optional[float]
+    trans_battery_flag: Optional[int]
     """transmitter battery status flag"""
 
     @classmethod

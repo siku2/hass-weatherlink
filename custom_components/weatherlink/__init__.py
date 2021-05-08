@@ -49,7 +49,7 @@ class WeatherLinkCoordinator(DataUpdateCoordinator):
             hass,
             logger,
             name="state",
-            update_interval=timedelta(seconds=10),
+            update_interval=timedelta(seconds=30),
         )
         await coordinator.__initalize(session)
 
@@ -104,10 +104,6 @@ class WeatherLinkEntity(CoordinatorEntity):
             "model": coord.device_model_name,
             "sw_version": "v1",
         }
-
-    @property
-    def name(self):
-        return self.coordinator.device_name
 
     @property
     def unique_id(self):
