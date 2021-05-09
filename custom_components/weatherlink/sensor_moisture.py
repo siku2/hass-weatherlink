@@ -1,7 +1,7 @@
 from typing import Optional
 
 from .api import CurrentConditions, MoistureCondition
-from .sensor_common import WeatherLinkSensor
+from .sensor_common import WeatherLinkSensor, round_optional
 
 __all__ = [
     "MoistureStatus",
@@ -94,12 +94,12 @@ class SoilABC(MoistureSensor, abc=True):
 
     @property
     def state(self):
-        return self._moist_soil(self._moisture_condition)
+        return round_optional(self._moist_soil(self._moisture_condition), 1)
 
     @property
     def device_state_attributes(self):
         return {
-            "temperature": self._temp(self._moisture_condition),
+            "temperature": round_optional(self._temp(self._moisture_condition), 1),
         }
 
 

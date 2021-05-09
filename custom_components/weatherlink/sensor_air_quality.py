@@ -91,8 +91,12 @@ class Pm1p0(
     device_class=None,
 ):
     @property
+    def icon(self):
+        return "mdi:air-filter"
+
+    @property
     def state(self):
-        return round(self._aq_condition.pm_1, 1)
+        return round(self._aq_condition.pm_1, 2)
 
 
 class Pm2p5(
@@ -102,8 +106,12 @@ class Pm2p5(
     device_class=None,
 ):
     @property
+    def icon(self):
+        return "mdi:air-filter"
+
+    @property
     def state(self):
-        return round(self._aq_condition.pm_2p5_nowcast, 1)
+        return round(self._aq_condition.pm_2p5_nowcast, 2)
 
     @property
     def device_state_attributes(self):
@@ -123,8 +131,12 @@ class Pm10p0(
     device_class=None,
 ):
     @property
+    def icon(self):
+        return "mdi:air-filter"
+
+    @property
     def state(self):
-        return round(self._aq_condition.pm_10_nowcast, 1)
+        return round(self._aq_condition.pm_10_nowcast, 2)
 
     @property
     def device_state_attributes(self):

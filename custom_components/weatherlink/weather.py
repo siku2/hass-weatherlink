@@ -74,12 +74,11 @@ class Weather(WeatherEntity, WeatherLinkEntity):
         if c.hum > 75:
             return "fog"
 
-        return sunny_or_clear_night(self.hass)
+        if state := self.states.get("sun.sun"):
+            if state.state == "below_horizon":
+                return "clear-night"
 
+        if c.solar_rad > 500:
+            return "sunny"
 
-def sunny_or_clear_night(hass: HomeAssistant) -> str:
-    if state := hass.states.get("sun.sun"):
-        if state.state == "below_horizon":
-            return "clear-night"
-
-    return "sunny"
+        return "partlycloudy"
