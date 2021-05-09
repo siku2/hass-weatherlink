@@ -74,7 +74,7 @@ class Weather(WeatherEntity, WeatherLinkEntity):
         if c.hum > 75:
             return "fog"
 
-        if state := self.states.get("sun.sun"):
+        if state := self.hass.states.get("sun.sun"):
             if state.state == "below_horizon":
                 return "clear-night"
 
