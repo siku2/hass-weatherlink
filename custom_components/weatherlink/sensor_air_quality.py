@@ -1,7 +1,14 @@
 from .api import AirQualityCondition
 from .sensor_common import WeatherLinkSensor
 
-__all__ = ["AirQualityStatus"]
+__all__ = [
+    "AirQualityStatus",
+    "Temperature",
+    "Humidity",
+    "Pm1p0",
+    "Pm2p5",
+    "Pm10p0",
+]
 
 
 class AirQualitySensor(WeatherLinkSensor, abc=True):
@@ -27,6 +34,10 @@ class AirQualityStatus(
     unit_of_measurement=None,
     device_class=None,
 ):
+    @property
+    def icon(self):
+        return "mdi:information"
+
     @property
     def state(self):
         return self._aq_condition.last_report_time
@@ -71,3 +82,56 @@ class Humidity(
     @property
     def state(self):
         return round(self._aq_condition.hum, 1)
+
+
+class Pm1p0(
+    AirQualitySensor,
+    sensor_name="PM 1.0",
+    unit_of_measurement="µg/m^3",
+    device_class=None,
+):
+    @property
+    def state(self):
+        return round(self._aq_condition.pm_1, 1)
+
+
+class Pm2p5(
+    AirQualitySensor,
+    sensor_name="PM 2.5",
+    unit_of_measurement="µg/m^3",
+    device_class=None,
+):
+    @property
+    def state(self):
+        return round(self._aq_condition.pm_2p5_nowcast, 1)
+
+    @property
+    def device_state_attributes(self):
+        c = self._aq_condition
+        return {
+            "1_min": c.pm_2p5,
+            "1_hr": c.pm_2p5_last_1_hour,
+            "3_hr": c.pm_2p5_last_3_hours,
+            "24_hr": c.pm_2p5_last_24_hours,
+        }
+
+
+class Pm10p0(
+    AirQualitySensor,
+    sensor_name="PM 10.0",
+    unit_of_measurement="µg/m^3",
+    device_class=None,
+):
+    @property
+    def state(self):
+        return round(self._aq_condition.pm_10_nowcast, 1)
+
+    @property
+    def device_state_attributes(self):
+        c = self._aq_condition
+        return {
+            "1_min": c.pm_10,
+            "1_hr": c.pm_10_last_1_hour,
+            "3_hr": c.pm_10_last_3_hours,
+            "24_hr": c.pm_10_last_24_hours,
+        }

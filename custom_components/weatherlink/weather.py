@@ -1,6 +1,7 @@
 import logging
 
 from homeassistant.components.weather import WeatherEntity
+from homeassistant.core import HomeAssistant
 
 from . import WeatherLinkCoordinator, WeatherLinkEntity
 from .api import IssCondition, LssBarCondition
@@ -55,5 +56,30 @@ class Weather(WeatherEntity, WeatherLinkEntity):
 
     @property
     def condition(self):
-        # TODO: determine this
-        return "unknown"
+        c = self._iss_condition
+        if c.rain_storm_start_at:
+            return "pouring"
+
+        if (c.rain_rate_hi_counts or 0.0) > 0:
+            if c.temp <= 0:
+                return "snowy"
+            elif 0 < c.temp < 5:
+                return "snowy-rainy"
+
+            return "rainy"
+
+        if c.wind_speed_avg_last_2_min > 20:
+            return "windy"
+
+        if c.hum > 75:
+            return "fog"
+
+        return sunny_or_clear_night(self.hass)
+
+
+def sunny_or_clear_night(hass: HomeAssistant) -> str:
+    if state := hass.states.get("sun.sun"):
+        if state.state == "below_horizon":
+            return "clear-night"
+
+    return "sunny"
