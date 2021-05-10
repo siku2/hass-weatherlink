@@ -162,7 +162,7 @@ class LeafABC(MoistureSensor, abc=True):
 
     @property
     def state(self):
-        return self._wet_leaf(self._moisture_condition)
+        return round_optional(self._wet_leaf(self._moisture_condition), 1)
 
 
 class Leaf1(

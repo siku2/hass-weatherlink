@@ -67,9 +67,9 @@ class Temperature(
     def device_state_attributes(self):
         c = self._aq_condition
         return {
-            "dew_point": c.dew_point,
-            "wet_bulb": c.wet_bulb,
-            "heat_index": c.heat_index,
+            "dew_point": round(c.dew_point, 1),
+            "wet_bulb": round(c.wet_bulb, 1),
+            "heat_index": round(c.heat_index, 1),
         }
 
 
@@ -117,10 +117,10 @@ class Pm2p5(
     def device_state_attributes(self):
         c = self._aq_condition
         return {
-            "1_min": c.pm_2p5,
-            "1_hr": c.pm_2p5_last_1_hour,
-            "3_hr": c.pm_2p5_last_3_hours,
-            "24_hr": c.pm_2p5_last_24_hours,
+            "1_min": round(c.pm_2p5, 2),
+            "1_hr": round(c.pm_2p5_last_1_hour, 2),
+            "3_hr": round(c.pm_2p5_last_3_hours, 2),
+            "24_hr": round(c.pm_2p5_last_24_hours, 2),
         }
 
 
@@ -142,8 +142,8 @@ class Pm10p0(
     def device_state_attributes(self):
         c = self._aq_condition
         return {
-            "1_min": c.pm_10,
-            "1_hr": c.pm_10_last_1_hour,
-            "3_hr": c.pm_10_last_3_hours,
-            "24_hr": c.pm_10_last_24_hours,
+            "1_min": round(c.pm_10, 2),
+            "1_hr": round(c.pm_10_last_1_hour, 2),
+            "3_hr": round(c.pm_10_last_3_hours, 2),
+            "24_hr": round(c.pm_10_last_24_hours, 2),
         }

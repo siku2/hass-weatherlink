@@ -29,6 +29,7 @@ class Weather(WeatherEntity, WeatherLinkEntity):
 
     @property
     def temperature(self):
+        # rounded by `WeatherEntity`
         return self._iss_condition.temp
 
     @property
@@ -44,15 +45,16 @@ class Weather(WeatherEntity, WeatherLinkEntity):
 
     @property
     def humidity(self):
+        # rounded by `WeatherEntity`
         return self._iss_condition.hum
 
     @property
     def wind_speed(self):
-        return self._iss_condition.wind_speed_avg_last_2_min
+        return round(self._iss_condition.wind_speed_avg_last_2_min, 1)
 
     @property
     def wind_bearing(self):
-        return self._iss_condition.wind_dir_scalar_avg_last_2_min
+        return round(self._iss_condition.wind_dir_scalar_avg_last_2_min, 1)
 
     @property
     def condition(self):

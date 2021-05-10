@@ -74,12 +74,12 @@ class Temperature(
     def device_state_attributes(self):
         c = self._iss_condition
         return {
-            "dew_point": c.dew_point,
-            "wet_bulb": c.wet_bulb,
-            "heat_index": c.heat_index,
-            "wind_chill": c.wind_chill,
-            "thw_index": c.thw_index,
-            "thsw_index": c.thsw_index,
+            "dew_point": round(c.dew_point, 1),
+            "wet_bulb": round_optional(c.wet_bulb, 1),
+            "heat_index": round(c.heat_index, 1),
+            "wind_chill": round(c.wind_chill, 1),
+            "thw_index": round(c.thw_index, 1),
+            "thsw_index": round(c.thsw_index, 1),
         }
 
 
@@ -123,9 +123,9 @@ class WindSpeed(
     def device_state_attributes(self):
         c = self._iss_condition
         return {
-            "high": c.wind_speed_hi_last_2_min,
-            "10_min": c.wind_speed_avg_last_10_min,
-            "10_min_high": c.wind_speed_hi_last_10_min,
+            "high": round(c.wind_speed_hi_last_2_min, 1),
+            "10_min": round(c.wind_speed_avg_last_10_min, 1),
+            "10_min_high": round(c.wind_speed_hi_last_10_min, 1),
         }
 
 
@@ -147,9 +147,9 @@ class WindBearing(
     def device_state_attributes(self):
         c = self._iss_condition
         return {
-            "high_dir": c.wind_dir_at_hi_speed_last_2_min,
-            "10_min_dir": c.wind_dir_scalar_avg_last_10_min,
-            "10_min_high_dir": c.wind_dir_at_hi_speed_last_10_min,
+            "high_dir": round(c.wind_dir_at_hi_speed_last_2_min, 1),
+            "10_min_dir": round(c.wind_dir_scalar_avg_last_10_min, 1),
+            "10_min_high_dir": round(c.wind_dir_at_hi_speed_last_10_min, 1),
         }
 
 
@@ -180,7 +180,7 @@ class UvIndex(
 
     @property
     def state(self):
-        return self._iss_condition.uv_index
+        return round(self._iss_condition.uv_index, 1)
 
 
 class Rainfall(
@@ -202,13 +202,13 @@ class Rainfall(
         c = self._iss_condition
         return {
             "rate": round(c.rain_rate_last, 1),
-            "rate_high": round(c.rain_rate_hi, 1),
-            "15_min": round(c.rainfall_last_15_min, 1),
+            "rate_high": round_optional(c.rain_rate_hi, 1),
+            "15_min": round_optional(c.rainfall_last_15_min, 1),
             "15_min_high": round(c.rain_rate_hi_last_15_min, 1),
-            "60_min": round(c.rainfall_last_60_min, 1),
-            "24_hr": round(c.rainfall_last_24_hr),
-            "monthly": round(c.rainfall_monthly),
-            "yearly": round(c.rainfall_year),
+            "60_min": round_optional(c.rainfall_last_60_min, 1),
+            "24_hr": round_optional(c.rainfall_last_24_hr, 1),
+            "monthly": round(c.rainfall_monthly, 1),
+            "yearly": round(c.rainfall_year, 1),
         }
 
 
