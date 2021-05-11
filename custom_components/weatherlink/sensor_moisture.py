@@ -131,13 +131,16 @@ class Soil4(
     ...
 
 
+_WETNESS2PERCENTAGE = 100.0 / 15.0
+
+
 class LeafABC(MoistureSensor, abc=True):
     _sensor_id: int
 
     def __init_subclass__(cls, *, sensor_id: int, **kwargs) -> None:
         super().__init_subclass__(
             sensor_name=f"Leaf {sensor_id}",
-            unit_of_measurement=None,
+            unit_of_measurement="%",
             device_class=None,
             **kwargs,
         )
@@ -162,7 +165,15 @@ class LeafABC(MoistureSensor, abc=True):
 
     @property
     def state(self):
-        return round_optional(self._wet_leaf(self._moisture_condition), 1)
+        if wetness := self._wet_leaf(self._moisture_condition):
+            return round(_WETNESS2PERCENTAGE * wetness, 0)
+        return None
+
+    @property
+    def device_state_attributes(self):
+        return {
+            "raw": round_optional(self._wet_leaf(self._moisture_condition), 1),
+        }
 
 
 class Leaf1(
