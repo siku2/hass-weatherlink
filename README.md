@@ -5,13 +5,6 @@
 
 A custom component for Davis Instruments' [WeatherLink](https://www.davisinstruments.com/weatherlinklive/) and [AirLink](https://www.davisinstruments.com/airlink/) stations.
 
-## Missing features
-
-The following features haven't been implemented yet.
-Feel free to open an issue if you require one of them.
-
-- Moisture sensor
-
 ## AirLink
 
 Older versions of the AirLink firmware use a different data structure format when transmitting updates.
