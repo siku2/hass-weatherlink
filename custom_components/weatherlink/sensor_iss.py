@@ -183,6 +183,29 @@ class UvIndex(
         return round(self._iss_condition.uv_index, 1)
 
 
+class RainRate(
+    IssSensor,
+    sensor_name="Rain rate",
+    unit_of_measurement="mm/h",
+    device_class=None,
+):
+    @property
+    def icon(self):
+        return "mdi:water"
+
+    @property
+    def state(self):
+        return round(self._iss_condition.rain_rate_last, 1)
+
+    @property
+    def device_state_attributes(self):
+        c = self._iss_condition
+        return {
+            "high": round_optional(c.rain_rate_hi, 1),
+            "15_min_high": round(c.rain_rate_hi_last_15_min, 1),
+        }
+
+
 class Rainfall(
     IssSensor,
     sensor_name="Rainfall",
@@ -201,10 +224,7 @@ class Rainfall(
     def device_state_attributes(self):
         c = self._iss_condition
         return {
-            "rate": round(c.rain_rate_last, 1),
-            "rate_high": round_optional(c.rain_rate_hi, 1),
             "15_min": round_optional(c.rainfall_last_15_min, 1),
-            "15_min_high": round(c.rain_rate_hi_last_15_min, 1),
             "60_min": round_optional(c.rainfall_last_60_min, 1),
             "24_hr": round_optional(c.rainfall_last_24_hr, 1),
             "monthly": round(c.rainfall_monthly, 1),

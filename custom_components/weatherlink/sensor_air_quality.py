@@ -87,7 +87,7 @@ class Humidity(
 class Pm1p0(
     AirQualitySensor,
     sensor_name="PM 1.0",
-    unit_of_measurement="µg/m^3",
+    unit_of_measurement="µg/m³",
     device_class=None,
 ):
     @property
@@ -102,7 +102,7 @@ class Pm1p0(
 class Pm2p5(
     AirQualitySensor,
     sensor_name="PM 2.5",
-    unit_of_measurement="µg/m^3",
+    unit_of_measurement="µg/m³",
     device_class=None,
 ):
     @property
@@ -127,7 +127,7 @@ class Pm2p5(
 class Pm10p0(
     AirQualitySensor,
     sensor_name="PM 10.0",
-    unit_of_measurement="µg/m^3",
+    unit_of_measurement="µg/m³",
     device_class=None,
 ):
     @property
