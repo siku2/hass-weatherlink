@@ -148,7 +148,7 @@ class WindBearing(
         c = self._iss_condition
         return {
             "high_dir": round(c.wind_dir_at_hi_speed_last_2_min, 1),
-            "10_min_dir": round(c.wind_dir_scalar_avg_last_10_min, 1),
+            "10_min_dir": round_optional(c.wind_dir_scalar_avg_last_10_min, 1),
             "10_min_high_dir": round(c.wind_dir_at_hi_speed_last_10_min, 1),
         }
 

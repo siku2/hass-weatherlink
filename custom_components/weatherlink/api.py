@@ -137,7 +137,7 @@ class IssCondition(ConditionRecord):
 
     wind_speed_avg_last_10_min: float
     """average wind speed over last 10 min **(km/h)**"""
-    wind_dir_scalar_avg_last_10_min: float
+    wind_dir_scalar_avg_last_10_min: Optional[float]
     """scalar average wind direction over last 10 min **(°degree)**"""
 
     wind_speed_hi_last_10_min: float
