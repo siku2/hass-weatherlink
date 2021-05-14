@@ -3,15 +3,7 @@ from typing import Optional
 from .api import CurrentConditions, MoistureCondition
 from .sensor_common import WeatherLinkSensor, round_optional
 
-__all__ = [
-    "MoistureStatus",
-    "Soil1",
-    "Soil2",
-    "Soil3",
-    "Soil4",
-    "Leaf1",
-    "Leaf2",
-]
+__all__ = ["MoistureStatus", "SOIL_MOISTURE_CLS", "SOIL_TEMPERATURE_CLS", "LEAF_CLS"]
 
 
 class MoistureSensor(WeatherLinkSensor, abc=True):
@@ -59,12 +51,12 @@ class MoistureStatus(
         }
 
 
-class SoilABC(MoistureSensor, abc=True):
+class SoilMoistureABC(MoistureSensor, abc=True):
     _sensor_id: int
 
     def __init_subclass__(cls, *, sensor_id: int, **kwargs) -> None:
         super().__init_subclass__(
-            sensor_name=f"Soil {sensor_id}",
+            sensor_name=f"Soil Moisture {sensor_id}",
             unit_of_measurement="cb",
             device_class=None,
             **kwargs,
@@ -78,15 +70,11 @@ class SoilABC(MoistureSensor, abc=True):
             return False
 
         c = conditions[MoistureCondition]
-        return (cls._moist_soil(c) or cls._temp(c)) is not None
+        return cls._moisture(c) is not None
 
     @classmethod
-    def _moist_soil(cls, c: MoistureCondition) -> Optional[float]:
+    def _moisture(cls, c: MoistureCondition) -> Optional[float]:
         return getattr(c, f"moist_soil_{cls._sensor_id}")
-
-    @classmethod
-    def _temp(cls, c: MoistureCondition) -> Optional[float]:
-        return getattr(c, f"temp_{cls._sensor_id}")
 
     @property
     def icon(self):
@@ -94,44 +82,48 @@ class SoilABC(MoistureSensor, abc=True):
 
     @property
     def state(self):
-        return round_optional(self._moist_soil(self._moisture_condition), 1)
+        return round_optional(self._moisture(self._moisture_condition), 1)
+
+
+SOIL_MOISTURE_CLS = tuple(
+    type(f"SoilMoisture{n}", (SoilMoistureABC,), {}, sensor_id=n) for n in range(1, 5)
+)
+
+
+class SoilTemperatureABC(MoistureSensor, abc=True):
+    _sensor_id: int
+
+    def __init_subclass__(cls, *, sensor_id: int, **kwargs) -> None:
+        super().__init_subclass__(
+            sensor_name=f"Soil Temperature {sensor_id}",
+            unit_of_measurement="°C",
+            device_class="temperature",
+            **kwargs,
+        )
+
+        cls._sensor_id = sensor_id
+
+    @classmethod
+    def _conditions_ok(cls, conditions: CurrentConditions) -> bool:
+        if not super()._conditions_ok(conditions):
+            return False
+
+        c = conditions[MoistureCondition]
+        return cls._temp(c) is not None
+
+    @classmethod
+    def _temp(cls, c: MoistureCondition) -> Optional[float]:
+        return getattr(c, f"temp_{cls._sensor_id}")
 
     @property
-    def device_state_attributes(self):
-        return {
-            "temperature": round_optional(self._temp(self._moisture_condition), 1),
-        }
+    def state(self):
+        return round_optional(self._temp(self._moisture_condition), 1)
 
 
-class Soil1(
-    SoilABC,
-    sensor_id=1,
-):
-    ...
-
-
-class Soil2(
-    SoilABC,
-    sensor_id=2,
-):
-    ...
-
-
-class Soil3(
-    SoilABC,
-    sensor_id=3,
-):
-    ...
-
-
-class Soil4(
-    SoilABC,
-    sensor_id=4,
-):
-    ...
-
-
-_WETNESS2PERCENTAGE = 100.0 / 15.0
+SOIL_TEMPERATURE_CLS = tuple(
+    type(f"SoilTemperature{n}", (SoilTemperatureABC,), {}, sensor_id=n)
+    for n in range(1, 5)
+)
 
 
 class LeafABC(MoistureSensor, abc=True):
@@ -166,7 +158,7 @@ class LeafABC(MoistureSensor, abc=True):
     @property
     def state(self):
         if wetness := self._wet_leaf(self._moisture_condition):
-            return round(_WETNESS2PERCENTAGE * wetness, 0)
+            return round(100.0 / 15.0 * wetness, 0)
         return None
 
     @property
@@ -176,15 +168,4 @@ class LeafABC(MoistureSensor, abc=True):
         }
 
 
-class Leaf1(
-    LeafABC,
-    sensor_id=1,
-):
-    ...
-
-
-class Leaf2(
-    LeafABC,
-    sensor_id=2,
-):
-    ...
+LEAF_CLS = tuple(type(f"LEAF{n}", (LeafABC,), {}, sensor_id=n) for n in range(1, 3))
