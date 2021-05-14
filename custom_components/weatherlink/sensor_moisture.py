@@ -168,4 +168,4 @@ class LeafABC(MoistureSensor, abc=True):
         }
 
 
-LEAF_CLS = tuple(type(f"LEAF{n}", (LeafABC,), {}, sensor_id=n) for n in range(1, 3))
+LEAF_CLS = tuple(type(f"Leaf{n}", (LeafABC,), {}, sensor_id=n) for n in range(1, 3))
