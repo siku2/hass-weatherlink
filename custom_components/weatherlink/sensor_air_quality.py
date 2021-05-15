@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from .api import AirQualityCondition
 from .sensor_common import WeatherLinkSensor
 
@@ -40,12 +42,23 @@ class AirQualityStatus(
 
     @property
     def state(self):
-        return self._aq_condition.last_report_time
+        update_interval = self.coordinator.update_interval
+        if not update_interval:
+            return "unknown"
+
+        deadline = datetime.now() - 2 * update_interval
+        last_report_time = self._aq_condition.last_report_time
+        # last report time is older than two update intervals
+        if last_report_time < deadline:
+            return "disconnected"
+
+        return "connected"
 
     @property
     def device_state_attributes(self):
         c = self._aq_condition
         return {
+            "last_report_time": c.last_report_time,
             "pm_data_1_hr": c.pct_pm_data_last_1_hour,
             "pm_data_3_hr": c.pct_pm_data_last_3_hours,
             "pm_data_24_hr": c.pct_pm_data_last_24_hours,
