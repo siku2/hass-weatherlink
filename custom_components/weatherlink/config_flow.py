@@ -1,6 +1,6 @@
 import dataclasses
 import logging
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 
 import voluptuous as vol
 from homeassistant import config_entries

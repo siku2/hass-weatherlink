@@ -1,11 +1,10 @@
 import logging
 
 from homeassistant.components.weather import WeatherEntity
-from homeassistant.core import HomeAssistant
 
 from . import WeatherLinkCoordinator, WeatherLinkEntity
 from .api import IssCondition, LssBarCondition
-from .const import DOMAIN
+from .const import DECIMALS_DIRECTION, DECIMALS_PRESSURE, DECIMALS_SPEED, DOMAIN
 
 logger = logging.getLogger(__name__)
 
@@ -39,7 +38,7 @@ class Weather(WeatherEntity, WeatherLinkEntity):
     @property
     def pressure(self):
         if condition := self._conditions.get(LssBarCondition):
-            return round(condition.bar_sea_level, 1)
+            return round(condition.bar_sea_level, DECIMALS_PRESSURE)
 
         return None
 
@@ -50,11 +49,13 @@ class Weather(WeatherEntity, WeatherLinkEntity):
 
     @property
     def wind_speed(self):
-        return round(self._iss_condition.wind_speed_avg_last_2_min, 1)
+        return round(self._iss_condition.wind_speed_avg_last_2_min, DECIMALS_SPEED)
 
     @property
     def wind_bearing(self):
-        return round(self._iss_condition.wind_dir_scalar_avg_last_2_min, 1)
+        return round(
+            self._iss_condition.wind_dir_scalar_avg_last_2_min, DECIMALS_DIRECTION
+        )
 
     @property
     def condition(self):

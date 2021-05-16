@@ -4,7 +4,7 @@ from homeassistant.components.air_quality import AirQualityEntity
 
 from . import WeatherLinkCoordinator, WeatherLinkEntity
 from .api import AirQualityCondition
-from .const import DOMAIN
+from .const import DECIMALS_PM, DOMAIN
 
 logger = logging.getLogger(__name__)
 
@@ -28,15 +28,15 @@ class AirQuality(AirQualityEntity, WeatherLinkEntity):
 
     @property
     def particulate_matter_2_5(self) -> float:
-        return round(self._aq_condition.pm_2p5_nowcast, 2)
+        return round(self._aq_condition.pm_2p5_nowcast, DECIMALS_PM)
 
     @property
     def particulate_matter_10(self) -> float:
-        return round(self._aq_condition.pm_10_nowcast, 2)
+        return round(self._aq_condition.pm_10_nowcast, DECIMALS_PM)
 
     @property
     def particulate_matter_0_1(self) -> float:
-        return round(self._aq_condition.pm_1, 2)
+        return round(self._aq_condition.pm_1, DECIMALS_PM)
 
     # TODO calculate AQI
     # @property

@@ -1,4 +1,14 @@
 from .api import IssCondition
+from .const import (
+    DECIMALS_DIRECTION,
+    DECIMALS_HUMIDITY,
+    DECIMALS_RADIATION,
+    DECIMALS_RAIN_RATE,
+    DECIMALS_RAIN_VOLUME,
+    DECIMALS_SPEED,
+    DECIMALS_TEMPERATURE,
+    DECIMALS_UV,
+)
 from .sensor_common import WeatherLinkSensor, round_optional
 
 __all__ = [
@@ -68,18 +78,18 @@ class Temperature(
 ):
     @property
     def state(self):
-        return round(self._iss_condition.temp, 1)
+        return round(self._iss_condition.temp, DECIMALS_TEMPERATURE)
 
     @property
     def device_state_attributes(self):
         c = self._iss_condition
         return {
-            "dew_point": round(c.dew_point, 1),
-            "wet_bulb": round_optional(c.wet_bulb, 1),
-            "heat_index": round(c.heat_index, 1),
-            "wind_chill": round(c.wind_chill, 1),
-            "thw_index": round(c.thw_index, 1),
-            "thsw_index": round(c.thsw_index, 1),
+            "dew_point": round(c.dew_point, DECIMALS_TEMPERATURE),
+            "wet_bulb": round_optional(c.wet_bulb, DECIMALS_TEMPERATURE),
+            "heat_index": round(c.heat_index, DECIMALS_TEMPERATURE),
+            "wind_chill": round(c.wind_chill, DECIMALS_TEMPERATURE),
+            "thw_index": round(c.thw_index, DECIMALS_TEMPERATURE),
+            "thsw_index": round(c.thsw_index, DECIMALS_TEMPERATURE),
         }
 
 
@@ -91,7 +101,7 @@ class ThswIndex(
 ):
     @property
     def state(self):
-        return round(self._iss_condition.thsw_index, 1)
+        return round(self._iss_condition.thsw_index, DECIMALS_TEMPERATURE)
 
 
 class Humidity(
@@ -102,7 +112,7 @@ class Humidity(
 ):
     @property
     def state(self):
-        return round(self._iss_condition.hum, 1)
+        return round(self._iss_condition.hum, DECIMALS_HUMIDITY)
 
 
 class WindSpeed(
@@ -117,15 +127,15 @@ class WindSpeed(
 
     @property
     def state(self):
-        return round(self._iss_condition.wind_speed_avg_last_2_min, 1)
+        return round(self._iss_condition.wind_speed_avg_last_2_min, DECIMALS_SPEED)
 
     @property
     def device_state_attributes(self):
         c = self._iss_condition
         return {
-            "high": round(c.wind_speed_hi_last_2_min, 1),
-            "10_min": round(c.wind_speed_avg_last_10_min, 1),
-            "10_min_high": round(c.wind_speed_hi_last_10_min, 1),
+            "high": round_optional(c.wind_speed_hi_last_2_min, DECIMALS_SPEED),
+            "10_min": round(c.wind_speed_avg_last_10_min, DECIMALS_SPEED),
+            "10_min_high": round(c.wind_speed_hi_last_10_min, DECIMALS_SPEED),
         }
 
 
@@ -141,15 +151,21 @@ class WindBearing(
 
     @property
     def state(self):
-        return round(self._iss_condition.wind_dir_scalar_avg_last_2_min, 1)
+        return round(
+            self._iss_condition.wind_dir_scalar_avg_last_2_min, DECIMALS_DIRECTION
+        )
 
     @property
     def device_state_attributes(self):
         c = self._iss_condition
         return {
-            "high_dir": round(c.wind_dir_at_hi_speed_last_2_min, 1),
-            "10_min_dir": round_optional(c.wind_dir_scalar_avg_last_10_min, 1),
-            "10_min_high_dir": round(c.wind_dir_at_hi_speed_last_10_min, 1),
+            "high": round(c.wind_dir_at_hi_speed_last_2_min, DECIMALS_DIRECTION),
+            "10_min": round_optional(
+                c.wind_dir_scalar_avg_last_10_min, DECIMALS_DIRECTION
+            ),
+            "10_min_high": round(
+                c.wind_dir_at_hi_speed_last_10_min, DECIMALS_DIRECTION
+            ),
         }
 
 
@@ -165,7 +181,7 @@ class SolarRad(
 
     @property
     def state(self):
-        return self._iss_condition.solar_rad
+        return round(self._iss_condition.solar_rad, DECIMALS_RADIATION)
 
 
 class UvIndex(
@@ -180,7 +196,7 @@ class UvIndex(
 
     @property
     def state(self):
-        return round(self._iss_condition.uv_index, 1)
+        return round(self._iss_condition.uv_index, DECIMALS_UV)
 
 
 class RainRate(
@@ -195,14 +211,14 @@ class RainRate(
 
     @property
     def state(self):
-        return round(self._iss_condition.rain_rate_last, 1)
+        return round(self._iss_condition.rain_rate_last, DECIMALS_RAIN_RATE)
 
     @property
     def device_state_attributes(self):
         c = self._iss_condition
         return {
-            "high": round_optional(c.rain_rate_hi, 1),
-            "15_min_high": round(c.rain_rate_hi_last_15_min, 1),
+            "high": round_optional(c.rain_rate_hi, DECIMALS_RAIN_RATE),
+            "15_min_high": round(c.rain_rate_hi_last_15_min, DECIMALS_RAIN_RATE),
         }
 
 
@@ -218,17 +234,17 @@ class Rainfall(
 
     @property
     def state(self):
-        return round(self._iss_condition.rainfall_daily, 1)
+        return round(self._iss_condition.rainfall_daily, DECIMALS_RAIN_VOLUME)
 
     @property
     def device_state_attributes(self):
         c = self._iss_condition
         return {
-            "15_min": round_optional(c.rainfall_last_15_min, 1),
-            "60_min": round_optional(c.rainfall_last_60_min, 1),
-            "24_hr": round_optional(c.rainfall_last_24_hr, 1),
-            "monthly": round(c.rainfall_monthly, 1),
-            "yearly": round(c.rainfall_year, 1),
+            "15_min": round_optional(c.rainfall_last_15_min, DECIMALS_RAIN_VOLUME),
+            "60_min": round_optional(c.rainfall_last_60_min, DECIMALS_RAIN_VOLUME),
+            "24_hr": round_optional(c.rainfall_last_24_hr, DECIMALS_RAIN_VOLUME),
+            "monthly": round(c.rainfall_monthly, DECIMALS_RAIN_VOLUME),
+            "yearly": round(c.rainfall_year, DECIMALS_RAIN_VOLUME),
         }
 
 
@@ -244,14 +260,14 @@ class Rainstorm(
 
     @property
     def state(self):
-        return round_optional(self._iss_condition.rain_storm, 1)
+        return round_optional(self._iss_condition.rain_storm, DECIMALS_RAIN_VOLUME)
 
     @property
     def device_state_attributes(self):
         c = self._iss_condition
         return {
             "start": c.rain_storm_start_at,
-            "last": round_optional(c.rain_storm_last, 1),
+            "last": round_optional(c.rain_storm_last, DECIMALS_RAIN_VOLUME),
             "last_start": c.rain_storm_last_start_at,
             "last_end": c.rain_storm_last_end_at,
         }

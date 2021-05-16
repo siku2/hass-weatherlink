@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from .api import AirQualityCondition
+from .const import DECIMALS_HUMIDITY, DECIMALS_PM, DECIMALS_TEMPERATURE
 from .sensor_common import WeatherLinkSensor
 
 __all__ = [
@@ -74,15 +75,15 @@ class Temperature(
 ):
     @property
     def state(self):
-        return round(self._aq_condition.temp, 1)
+        return round(self._aq_condition.temp, DECIMALS_TEMPERATURE)
 
     @property
     def device_state_attributes(self):
         c = self._aq_condition
         return {
-            "dew_point": round(c.dew_point, 1),
-            "wet_bulb": round(c.wet_bulb, 1),
-            "heat_index": round(c.heat_index, 1),
+            "dew_point": round(c.dew_point, DECIMALS_TEMPERATURE),
+            "wet_bulb": round(c.wet_bulb, DECIMALS_TEMPERATURE),
+            "heat_index": round(c.heat_index, DECIMALS_TEMPERATURE),
         }
 
 
@@ -94,7 +95,7 @@ class Humidity(
 ):
     @property
     def state(self):
-        return round(self._aq_condition.hum, 1)
+        return round(self._aq_condition.hum, DECIMALS_HUMIDITY)
 
 
 class Pm1p0(
@@ -109,7 +110,7 @@ class Pm1p0(
 
     @property
     def state(self):
-        return round(self._aq_condition.pm_1, 2)
+        return round(self._aq_condition.pm_1, DECIMALS_PM)
 
 
 class Pm2p5(
@@ -124,16 +125,16 @@ class Pm2p5(
 
     @property
     def state(self):
-        return round(self._aq_condition.pm_2p5_nowcast, 2)
+        return round(self._aq_condition.pm_2p5_nowcast, DECIMALS_PM)
 
     @property
     def device_state_attributes(self):
         c = self._aq_condition
         return {
-            "1_min": round(c.pm_2p5, 2),
-            "1_hr": round(c.pm_2p5_last_1_hour, 2),
-            "3_hr": round(c.pm_2p5_last_3_hours, 2),
-            "24_hr": round(c.pm_2p5_last_24_hours, 2),
+            "1_min": round(c.pm_2p5, DECIMALS_PM),
+            "1_hr": round(c.pm_2p5_last_1_hour, DECIMALS_PM),
+            "3_hr": round(c.pm_2p5_last_3_hours, DECIMALS_PM),
+            "24_hr": round(c.pm_2p5_last_24_hours, DECIMALS_PM),
         }
 
 
@@ -149,14 +150,14 @@ class Pm10p0(
 
     @property
     def state(self):
-        return round(self._aq_condition.pm_10_nowcast, 2)
+        return round(self._aq_condition.pm_10_nowcast, DECIMALS_PM)
 
     @property
     def device_state_attributes(self):
         c = self._aq_condition
         return {
-            "1_min": round(c.pm_10, 2),
-            "1_hr": round(c.pm_10_last_1_hour, 2),
-            "3_hr": round(c.pm_10_last_3_hours, 2),
-            "24_hr": round(c.pm_10_last_24_hours, 2),
+            "1_min": round(c.pm_10, DECIMALS_PM),
+            "1_hr": round(c.pm_10_last_1_hour, DECIMALS_PM),
+            "3_hr": round(c.pm_10_last_3_hours, DECIMALS_PM),
+            "24_hr": round(c.pm_10_last_24_hours, DECIMALS_PM),
         }

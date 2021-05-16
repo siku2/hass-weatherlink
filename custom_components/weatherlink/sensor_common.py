@@ -1,6 +1,6 @@
 import logging
 import typing
-from typing import Iterable, Iterator, List, Optional, Type
+from typing import Iterable, Iterator, List, Optional, Type, Union
 
 from . import WeatherLinkCoordinator, WeatherLinkEntity
 from .api import ConditionRecord, CurrentConditions
@@ -91,7 +91,9 @@ class WeatherLinkSensor(WeatherLinkEntity):
         return self._device_class
 
 
-def round_optional(f: Optional[float], ndigits: int = 0) -> Optional[float]:
+def round_optional(
+    f: Optional[Union[int, float]], ndigits: int = None
+) -> Optional[Union[int, float]]:
     if not f:
         return f
     return round(f, ndigits)

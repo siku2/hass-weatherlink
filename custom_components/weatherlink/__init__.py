@@ -1,8 +1,5 @@
-import asyncio
-import dataclasses
 import logging
 from datetime import timedelta
-from typing import cast
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers import aiohttp_client
@@ -11,7 +8,7 @@ from homeassistant.helpers.update_coordinator import (
     DataUpdateCoordinator,
 )
 
-from .api import CurrentConditions, DeviceType, WeatherLinkSession
+from .api import CurrentConditions, WeatherLinkSession
 from .const import DOMAIN, PLATFORMS
 
 logger = logging.getLogger(__name__)

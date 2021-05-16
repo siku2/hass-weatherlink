@@ -1,6 +1,7 @@
 from typing import Optional
 
 from .api import CurrentConditions, MoistureCondition
+from .const import DECIMALS_LEAF_WETNESS, DECIMALS_SOIL_MOISTURE, DECIMALS_TEMPERATURE
 from .sensor_common import WeatherLinkSensor, round_optional
 
 __all__ = ["MoistureStatus", "SOIL_MOISTURE_CLS", "SOIL_TEMPERATURE_CLS", "LEAF_CLS"]
@@ -82,7 +83,9 @@ class SoilMoistureABC(MoistureSensor, abc=True):
 
     @property
     def state(self):
-        return round_optional(self._moisture(self._moisture_condition), 1)
+        return round_optional(
+            self._moisture(self._moisture_condition), DECIMALS_SOIL_MOISTURE
+        )
 
 
 SOIL_MOISTURE_CLS = tuple(
@@ -117,7 +120,9 @@ class SoilTemperatureABC(MoistureSensor, abc=True):
 
     @property
     def state(self):
-        return round_optional(self._temp(self._moisture_condition), 1)
+        return round_optional(
+            self._temp(self._moisture_condition), DECIMALS_TEMPERATURE
+        )
 
 
 SOIL_TEMPERATURE_CLS = tuple(
@@ -158,7 +163,7 @@ class LeafABC(MoistureSensor, abc=True):
     @property
     def state(self):
         if wetness := self._wet_leaf(self._moisture_condition):
-            return round(100.0 / 15.0 * wetness, 0)
+            return round(100.0 / 15.0 * wetness, DECIMALS_LEAF_WETNESS)
         return None
 
     @property

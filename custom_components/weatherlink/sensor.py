@@ -1,6 +1,12 @@
 from . import WeatherLinkCoordinator
 from .api import LssBarCondition, LssTempHumCondition
-from .const import DOMAIN
+from .const import (
+    DECIMALS_HUMIDITY,
+    DECIMALS_PRESSURE,
+    DECIMALS_PRESSURE_TREND,
+    DECIMALS_TEMPERATURE,
+    DOMAIN,
+)
 from .sensor_air_quality import *
 from .sensor_common import WeatherLinkSensor, round_optional
 from .sensor_iss import *
@@ -26,14 +32,14 @@ class Pressure(
 
     @property
     def state(self):
-        return round(self._lss_bar_condition.bar_sea_level, 1)
+        return round(self._lss_bar_condition.bar_sea_level, DECIMALS_PRESSURE)
 
     @property
     def device_state_attributes(self):
         condition = self._lss_bar_condition
         return {
-            "trend": round_optional(condition.bar_trend, 1),
-            "absolute": round(condition.bar_absolute, 1),
+            "trend": round_optional(condition.bar_trend, DECIMALS_PRESSURE_TREND),
+            "absolute": round(condition.bar_absolute, DECIMALS_PRESSURE),
         }
 
 
@@ -50,13 +56,28 @@ class InsideTemp(
 
     @property
     def state(self):
-        return round(self._lss_temp_hum_condition.temp_in, 1)
+        return round(self._lss_temp_hum_condition.temp_in, DECIMALS_TEMPERATURE)
 
     @property
     def device_state_attributes(self):
         condition = self._lss_temp_hum_condition
         return {
-            "humidity": round(condition.hum_in, 1),
-            "dew_point": round(condition.dew_point_in, 1),
-            "heat_index": round(condition.heat_index_in, 1),
+            "dew_point": round(condition.dew_point_in, DECIMALS_TEMPERATURE),
+            "heat_index": round(condition.heat_index_in, DECIMALS_TEMPERATURE),
         }
+
+
+class InsideHum(
+    WeatherLinkSensor,
+    sensor_name="Inside Humidity",
+    unit_of_measurement="%",
+    device_class="humidity",
+    required_conditions=(LssTempHumCondition,),
+):
+    @property
+    def _lss_temp_hum_condition(self) -> LssTempHumCondition:
+        return self._conditions[LssTempHumCondition]
+
+    @property
+    def state(self):
+        return round(self._lss_temp_hum_condition.hum_in, DECIMALS_HUMIDITY)
