@@ -133,9 +133,31 @@ class WindSpeed(
     def device_state_attributes(self):
         c = self._iss_condition
         return {
-            "high": round_optional(c.wind_speed_hi_last_2_min, DECIMALS_SPEED),
             "10_min": round(c.wind_speed_avg_last_10_min, DECIMALS_SPEED),
-            "10_min_high": round(c.wind_speed_hi_last_10_min, DECIMALS_SPEED),
+        }
+
+
+class WindMaxSpeed(
+    IssSensor,
+    sensor_name="Wind max speed",
+    unit_of_measurement="km/h",
+    device_class=None,
+):
+    @property
+    def icon(self):
+        return "mdi:weather-windy"
+
+    @property
+    def state(self):
+        return round_optional(
+            self._iss_condition.wind_speed_hi_last_2_min, DECIMALS_SPEED
+        )
+
+    @property
+    def device_state_attributes(self):
+        c = self._iss_condition
+        return {
+            "10_min": round(c.wind_speed_hi_last_10_min, DECIMALS_SPEED),
         }
 
 
