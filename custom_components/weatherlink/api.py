@@ -108,7 +108,7 @@ class IssCondition(ConditionRecord):
     """"""
     heat_index: float
     """"""
-    wind_chill: float
+    wind_chill: Optional[float]
     """"""
     thw_index: float
     """"""
@@ -132,7 +132,7 @@ class IssCondition(ConditionRecord):
 
     wind_speed_hi_last_2_min: Optional[float]
     """maximum wind speed over last 2 min **(km/h)**"""
-    wind_dir_at_hi_speed_last_2_min: float
+    wind_dir_at_hi_speed_last_2_min: Optional[float]
     """gust wind direction over last 2 min **(°degree)**"""
 
     wind_speed_avg_last_10_min: float

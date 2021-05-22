@@ -87,7 +87,7 @@ class Temperature(
             "dew_point": round(c.dew_point, DECIMALS_TEMPERATURE),
             "wet_bulb": round_optional(c.wet_bulb, DECIMALS_TEMPERATURE),
             "heat_index": round(c.heat_index, DECIMALS_TEMPERATURE),
-            "wind_chill": round(c.wind_chill, DECIMALS_TEMPERATURE),
+            "wind_chill": round_optional(c.wind_chill, DECIMALS_TEMPERATURE),
             "thw_index": round(c.thw_index, DECIMALS_TEMPERATURE),
             "thsw_index": round(c.thsw_index, DECIMALS_TEMPERATURE),
         }
@@ -181,7 +181,7 @@ class WindBearing(
     def device_state_attributes(self):
         c = self._iss_condition
         return {
-            "high": round(c.wind_dir_at_hi_speed_last_2_min, DECIMALS_DIRECTION),
+            "high": round_optional(c.wind_dir_at_hi_speed_last_2_min, DECIMALS_DIRECTION),
             "10_min": round_optional(
                 c.wind_dir_scalar_avg_last_10_min, DECIMALS_DIRECTION
             ),
