@@ -78,18 +78,18 @@ class Temperature(
 ):
     @property
     def state(self):
-        return round(self._iss_condition.temp, DECIMALS_TEMPERATURE)
+        return round_optional(self._iss_condition.temp, DECIMALS_TEMPERATURE)
 
     @property
     def device_state_attributes(self):
         c = self._iss_condition
         return {
-            "dew_point": round(c.dew_point, DECIMALS_TEMPERATURE),
+            "dew_point": round_optional(c.dew_point, DECIMALS_TEMPERATURE),
             "wet_bulb": round_optional(c.wet_bulb, DECIMALS_TEMPERATURE),
-            "heat_index": round(c.heat_index, DECIMALS_TEMPERATURE),
+            "heat_index": round_optional(c.heat_index, DECIMALS_TEMPERATURE),
             "wind_chill": round_optional(c.wind_chill, DECIMALS_TEMPERATURE),
-            "thw_index": round(c.thw_index, DECIMALS_TEMPERATURE),
-            "thsw_index": round(c.thsw_index, DECIMALS_TEMPERATURE),
+            "thw_index": round_optional(c.thw_index, DECIMALS_TEMPERATURE),
+            "thsw_index": round_optional(c.thsw_index, DECIMALS_TEMPERATURE),
         }
 
 
@@ -101,7 +101,7 @@ class ThswIndex(
 ):
     @property
     def state(self):
-        return round(self._iss_condition.thsw_index, DECIMALS_TEMPERATURE)
+        return round_optional(self._iss_condition.thsw_index, DECIMALS_TEMPERATURE)
 
 
 class Humidity(
@@ -112,7 +112,7 @@ class Humidity(
 ):
     @property
     def state(self):
-        return round(self._iss_condition.hum, DECIMALS_HUMIDITY)
+        return round_optional(self._iss_condition.hum, DECIMALS_HUMIDITY)
 
 
 class WindSpeed(
@@ -127,13 +127,15 @@ class WindSpeed(
 
     @property
     def state(self):
-        return round(self._iss_condition.wind_speed_avg_last_2_min, DECIMALS_SPEED)
+        return round_optional(
+            self._iss_condition.wind_speed_avg_last_2_min, DECIMALS_SPEED
+        )
 
     @property
     def device_state_attributes(self):
         c = self._iss_condition
         return {
-            "10_min": round(c.wind_speed_avg_last_10_min, DECIMALS_SPEED),
+            "10_min": round_optional(c.wind_speed_avg_last_10_min, DECIMALS_SPEED),
         }
 
 
@@ -157,7 +159,7 @@ class WindMaxSpeed(
     def device_state_attributes(self):
         c = self._iss_condition
         return {
-            "10_min": round(c.wind_speed_hi_last_10_min, DECIMALS_SPEED),
+            "10_min": round_optional(c.wind_speed_hi_last_10_min, DECIMALS_SPEED),
         }
 
 
@@ -173,7 +175,7 @@ class WindBearing(
 
     @property
     def state(self):
-        return round(
+        return round_optional(
             self._iss_condition.wind_dir_scalar_avg_last_2_min, DECIMALS_DIRECTION
         )
 
@@ -181,11 +183,13 @@ class WindBearing(
     def device_state_attributes(self):
         c = self._iss_condition
         return {
-            "high": round_optional(c.wind_dir_at_hi_speed_last_2_min, DECIMALS_DIRECTION),
+            "high": round_optional(
+                c.wind_dir_at_hi_speed_last_2_min, DECIMALS_DIRECTION
+            ),
             "10_min": round_optional(
                 c.wind_dir_scalar_avg_last_10_min, DECIMALS_DIRECTION
             ),
-            "10_min_high": round(
+            "10_min_high": round_optional(
                 c.wind_dir_at_hi_speed_last_10_min, DECIMALS_DIRECTION
             ),
         }
@@ -203,7 +207,7 @@ class SolarRad(
 
     @property
     def state(self):
-        return round(self._iss_condition.solar_rad, DECIMALS_RADIATION)
+        return round_optional(self._iss_condition.solar_rad, DECIMALS_RADIATION)
 
 
 class UvIndex(
@@ -218,7 +222,7 @@ class UvIndex(
 
     @property
     def state(self):
-        return round(self._iss_condition.uv_index, DECIMALS_UV)
+        return round_optional(self._iss_condition.uv_index, DECIMALS_UV)
 
 
 class RainRate(

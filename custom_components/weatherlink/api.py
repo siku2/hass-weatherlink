@@ -98,51 +98,51 @@ class IssCondition(ConditionRecord):
     rx_state: Optional[ReceiverState]
     """configured radio receiver state"""
 
-    temp: float
+    temp: Optional[float]
     """most recent valid temperature"""
-    hum: float
+    hum: Optional[float]
     """most recent valid humidity **(%RH)**"""
-    dew_point: float
+    dew_point: Optional[float]
     """"""
     wet_bulb: Optional[float]
     """"""
-    heat_index: float
+    heat_index: Optional[float]
     """"""
     wind_chill: Optional[float]
     """"""
-    thw_index: float
+    thw_index: Optional[float]
     """"""
-    thsw_index: float
+    thsw_index: Optional[float]
     """"""
 
-    wind_speed_last: float
+    wind_speed_last: Optional[float]
     """most recent valid wind speed **(km/h)**"""
     wind_dir_last: Optional[int]
     """most recent valid wind direction **(°degree)**"""
 
-    wind_speed_avg_last_1_min: float
+    wind_speed_avg_last_1_min: Optional[float]
     """average wind speed over last 1 min **(km/h)**"""
-    wind_dir_scalar_avg_last_1_min: int
+    wind_dir_scalar_avg_last_1_min: Optional[int]
     """scalar average wind direction over last 1 min **(°degree)**"""
 
-    wind_speed_avg_last_2_min: float
+    wind_speed_avg_last_2_min: Optional[float]
     """average wind speed over last 2 min **(km/h)**"""
-    wind_dir_scalar_avg_last_2_min: float
+    wind_dir_scalar_avg_last_2_min: Optional[int]
     """scalar average wind direction over last 2 min **(°degree)**"""
 
     wind_speed_hi_last_2_min: Optional[float]
     """maximum wind speed over last 2 min **(km/h)**"""
-    wind_dir_at_hi_speed_last_2_min: Optional[float]
+    wind_dir_at_hi_speed_last_2_min: Optional[int]
     """gust wind direction over last 2 min **(°degree)**"""
 
-    wind_speed_avg_last_10_min: float
+    wind_speed_avg_last_10_min: Optional[float]
     """average wind speed over last 10 min **(km/h)**"""
-    wind_dir_scalar_avg_last_10_min: Optional[float]
+    wind_dir_scalar_avg_last_10_min: Optional[int]
     """scalar average wind direction over last 10 min **(°degree)**"""
 
-    wind_speed_hi_last_10_min: float
+    wind_speed_hi_last_10_min: Optional[float]
     """maximum wind speed over last 10 min **(km/h)**"""
-    wind_dir_at_hi_speed_last_10_min: float
+    wind_dir_at_hi_speed_last_10_min: Optional[int]
     """gust wind direction over last 10 min **(°degree)**"""
 
     rain_size: CollectorSize
@@ -175,9 +175,9 @@ class IssCondition(ConditionRecord):
     rain_storm_start_at: Optional[datetime]
     """timestamp of current rain storm start"""
 
-    solar_rad: int
+    solar_rad: Optional[int]
     """most recent solar radiation **(W/m²)**"""
-    uv_index: float
+    uv_index: Optional[float]
     """most recent UV index **(Index)**"""
 
     trans_battery_flag: int
@@ -384,6 +384,8 @@ class AirQualityCondition(ConditionRecord):
         return cls(**data)
 
 
+_STRUCTURE_TYPE_KEY = "data_structure_type"
+
 _COND2CLS = {
     ConditionType.Iss: IssCondition,
     ConditionType.Moisture: MoistureCondition,
@@ -394,9 +396,23 @@ _COND2CLS = {
 
 
 def condition_from_json(data: JsonObject, **kwargs) -> ConditionRecord:
-    cond_ty = ConditionType(data.pop("data_structure_type"))
+    cond_ty = ConditionType(data.pop(_STRUCTURE_TYPE_KEY))
     cls = cond_ty.record_class()
     return cls.from_json(data, **kwargs)
+
+
+def flatten_conditions(conditions: Iterable[JsonObject]) -> List[JsonObject]:
+    cond_by_type = {}
+    for cond in conditions:
+        cond_type = cond[_STRUCTURE_TYPE_KEY]
+        try:
+            existing = cond_by_type[cond_type]
+        except KeyError:
+            cond_by_type[cond_type] = cond
+        else:
+            update_dict_where_none(existing, cond)
+
+    return list(cond_by_type.values())
 
 
 class DeviceType(enum.Enum):
@@ -426,7 +442,8 @@ class CurrentConditions(FromJson, Mapping[Type[RecordT], RecordT]):
     @classmethod
     def _from_json(cls, data: JsonObject, **kwargs):
         conditions = []
-        for i, cond_data in enumerate(data["conditions"]):
+        raw_conditions = flatten_conditions(data["conditions"])
+        for i, cond_data in enumerate(raw_conditions):
             try:
                 cond = condition_from_json(cond_data, **kwargs)
             except Exception:
@@ -576,3 +593,9 @@ def json_set_default_none(d: JsonObject, *keys: str) -> None:
     for key in keys:
         if key not in d:
             d[key] = None
+
+
+def update_dict_where_none(d: JsonObject, updates: JsonObject) -> None:
+    for key, value in updates.items():
+        if d.get(key) is None:
+            d[key] = value

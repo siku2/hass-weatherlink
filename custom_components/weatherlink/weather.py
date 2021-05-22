@@ -5,6 +5,7 @@ from homeassistant.components.weather import WeatherEntity
 from . import WeatherLinkCoordinator, WeatherLinkEntity
 from .api import IssCondition, LssBarCondition
 from .const import DECIMALS_DIRECTION, DECIMALS_PRESSURE, DECIMALS_SPEED, DOMAIN
+from .sensor_common import round_optional
 
 logger = logging.getLogger(__name__)
 
@@ -49,11 +50,13 @@ class Weather(WeatherEntity, WeatherLinkEntity):
 
     @property
     def wind_speed(self):
-        return round(self._iss_condition.wind_speed_avg_last_2_min, DECIMALS_SPEED)
+        return round_optional(
+            self._iss_condition.wind_speed_avg_last_2_min, DECIMALS_SPEED
+        )
 
     @property
     def wind_bearing(self):
-        return round(
+        return round_optional(
             self._iss_condition.wind_dir_scalar_avg_last_2_min, DECIMALS_DIRECTION
         )
 
@@ -63,24 +66,25 @@ class Weather(WeatherEntity, WeatherLinkEntity):
 
         rain_rate = c.rain_rate_hi or 0.0
         if rain_rate > 0.25:
-            if c.temp <= 0:
-                return "snowy"
-            elif 0 < c.temp < 5:
-                return "snowy-rainy"
+            if temp := c.temp:
+                if temp <= 0:
+                    return "snowy"
+                elif 0 < temp < 5:
+                    return "snowy-rainy"
 
             if rain_rate > 4.0:
                 return "pouring"
 
             return "rainy"
 
-        if c.wind_speed_avg_last_2_min > 20:
+        if (c.wind_speed_avg_last_2_min or 0.0) > 20:
             return "windy"
 
         if state := self.hass.states.get("sun.sun"):
             if state.state == "below_horizon":
                 return "clear-night"
 
-        if c.solar_rad > 500:
+        if (c.solar_rad or 0) > 500:
             return "sunny"
 
         return "partlycloudy"
