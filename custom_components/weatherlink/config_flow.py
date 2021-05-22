@@ -21,6 +21,12 @@ class FormError(Exception):
 
 
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
+    @staticmethod
+    def async_get_options_flow(
+        config_entry: config_entries.ConfigEntry,
+    ) -> config_entries.OptionsFlow:
+        return OptionsFlow()
+
     async def discover(self, host: str) -> dict:
         logger.info("discovering: %s", host)
 
@@ -74,5 +80,23 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             step_id="zeroconf_confirm",
             data_schema=vol.Schema(
                 {vol.Optional("title", default=self.discovery_data["title"]): str}
+            ),
+        )
+
+
+class OptionsFlow(config_entries.OptionsFlow):
+    async def async_step_init(self, user_input=None):
+        if user_input is not None:
+            return self.async_create_entry(title="", data=user_input)
+
+        return self.async_show_form(
+            step_id="init",
+            data_schema=vol.Schema(
+                {
+                    vol.Required(
+                        "show_things",
+                        default=self.config_entry.options.get("show_things"),
+                    ): bool
+                }
             ),
         )
