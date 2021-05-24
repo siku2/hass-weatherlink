@@ -2,6 +2,7 @@ import logging
 from datetime import timedelta
 
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.core import HomeAssistant
 from homeassistant.helpers import aiohttp_client
 from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
@@ -10,6 +11,7 @@ from homeassistant.helpers.update_coordinator import (
 
 from .api import CurrentConditions, WeatherLinkSession
 from .const import DOMAIN, PLATFORMS
+from .units import UnitConfig, get_unit_config
 
 logger = logging.getLogger(__name__)
 
@@ -21,14 +23,23 @@ async def async_setup(hass, _config):
 
 class WeatherLinkCoordinator(DataUpdateCoordinator):
     session: WeatherLinkSession
+    units: UnitConfig
     current_conditions: CurrentConditions
 
     device_did: str
     device_name: str
     device_model_name: str
 
-    async def __initalize(self, session: WeatherLinkSession) -> None:
+    async def __update_config(self, hass: HomeAssistant, entry: ConfigEntry):
+        self.units = get_unit_config(hass, entry)
+
+    async def __initalize(
+        self, session: WeatherLinkSession, entry: ConfigEntry
+    ) -> None:
         self.session = session
+        entry.add_update_listener(self.__update_config)
+        await self.__update_config(self.hass, entry)
+
         self.update_method = self.__fetch_data
         await self.__fetch_data()
 
@@ -41,14 +52,14 @@ class WeatherLinkCoordinator(DataUpdateCoordinator):
         self.current_conditions = await self.session.current_conditions()
 
     @classmethod
-    async def build(cls, hass, session: WeatherLinkSession):
+    async def build(cls, hass, session: WeatherLinkSession, entry: ConfigEntry):
         coordinator = cls(
             hass,
             logger,
             name="state",
             update_interval=timedelta(seconds=30),
         )
-        await coordinator.__initalize(session)
+        await coordinator.__initalize(session, entry)
 
         return coordinator
 
@@ -56,8 +67,11 @@ class WeatherLinkCoordinator(DataUpdateCoordinator):
 async def setup_coordinator(hass, entry: ConfigEntry):
     host = entry.data["host"]
 
-    session = WeatherLinkSession(aiohttp_client.async_get_clientsession(hass), host)
-    coordinator = await WeatherLinkCoordinator.build(hass, session)
+    coordinator = await WeatherLinkCoordinator.build(
+        hass,
+        WeatherLinkSession(aiohttp_client.async_get_clientsession(hass), host),
+        entry,
+    )
     hass.data[DOMAIN][entry.entry_id] = coordinator
 
 
@@ -90,6 +104,10 @@ class WeatherLinkEntity(CoordinatorEntity):
     @property
     def _conditions(self) -> CurrentConditions:
         return self.coordinator.current_conditions
+
+    @property
+    def units(self) -> UnitConfig:
+        return self.coordinator.units
 
     @property
     def device_info(self):

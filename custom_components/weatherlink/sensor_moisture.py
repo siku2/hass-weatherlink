@@ -1,7 +1,8 @@
 from typing import Optional
 
+from . import units
 from .api import CurrentConditions, MoistureCondition
-from .const import DECIMALS_LEAF_WETNESS, DECIMALS_SOIL_MOISTURE, DECIMALS_TEMPERATURE
+from .const import DECIMALS_LEAF_WETNESS, DECIMALS_SOIL_MOISTURE
 from .sensor_common import WeatherLinkSensor, round_optional
 
 __all__ = ["MoistureStatus", "SOIL_MOISTURE_CLS", "SOIL_TEMPERATURE_CLS", "LEAF_CLS"]
@@ -99,7 +100,7 @@ class SoilTemperatureABC(MoistureSensor, abc=True):
     def __init_subclass__(cls, *, sensor_id: int, **kwargs) -> None:
         super().__init_subclass__(
             sensor_name=f"Soil Temperature {sensor_id}",
-            unit_of_measurement="°C",
+            unit_of_measurement=units.Temperature,
             device_class="temperature",
             **kwargs,
         )
@@ -120,8 +121,8 @@ class SoilTemperatureABC(MoistureSensor, abc=True):
 
     @property
     def state(self):
-        return round_optional(
-            self._temp(self._moisture_condition), DECIMALS_TEMPERATURE
+        return self.units.temperature.convert_optional(
+            self._temp(self._moisture_condition)
         )
 
 

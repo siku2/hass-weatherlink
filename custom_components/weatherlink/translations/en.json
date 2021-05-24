@@ -18,5 +18,20 @@
     "error": {
       "connect_failed": "Failed to connect"
     }
+  },
+  "options": {
+    "step": {
+      "units": {
+        "title": "Units",
+        "data": {
+          "temperature": "Temperature",
+          "pressure": "Pressure",
+          "wind_speed": "Wind Speed",
+          "pm": "Pm",
+          "rain_rate": "Rain rate",
+          "rainfall": "Rain volume"
+        }
+      }
+    }
   }
 }

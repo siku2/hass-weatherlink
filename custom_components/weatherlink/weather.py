@@ -4,8 +4,7 @@ from homeassistant.components.weather import WeatherEntity
 
 from . import WeatherLinkCoordinator, WeatherLinkEntity
 from .api import IssCondition, LssBarCondition
-from .const import DECIMALS_DIRECTION, DECIMALS_PRESSURE, DECIMALS_SPEED, DOMAIN
-from .sensor_common import round_optional
+from .const import DOMAIN
 
 logger = logging.getLogger(__name__)
 
@@ -30,16 +29,16 @@ class Weather(WeatherEntity, WeatherLinkEntity):
     @property
     def temperature(self):
         # rounded by `WeatherEntity`
-        return self._iss_condition.temp
+        return self.units.temperature.convert_optional(self._iss_condition.temp)
 
     @property
     def temperature_unit(self):
-        return "°C"
+        return self.units.temperature.unit_of_measurement
 
     @property
     def pressure(self):
         if condition := self._conditions.get(LssBarCondition):
-            return round(condition.bar_sea_level, DECIMALS_PRESSURE)
+            return self.units.pressure.convert(condition.bar_sea_level)
 
         return None
 
@@ -50,15 +49,13 @@ class Weather(WeatherEntity, WeatherLinkEntity):
 
     @property
     def wind_speed(self):
-        return round_optional(
-            self._iss_condition.wind_speed_avg_last_2_min, DECIMALS_SPEED
+        return self.units.wind_speed.convert_optional(
+            self._iss_condition.wind_speed_avg_last_2_min
         )
 
     @property
     def wind_bearing(self):
-        return round_optional(
-            self._iss_condition.wind_dir_scalar_avg_last_2_min, DECIMALS_DIRECTION
-        )
+        return self._iss_condition.wind_dir_scalar_avg_last_2_min
 
     @property
     def condition(self):
