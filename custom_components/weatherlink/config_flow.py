@@ -8,6 +8,7 @@ from homeassistant.helpers import aiohttp_client
 
 from .api import WeatherLinkSession
 from .const import DOMAIN
+from .units import UnitConfig, get_unit_config
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +26,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     def async_get_options_flow(
         config_entry: config_entries.ConfigEntry,
     ) -> config_entries.OptionsFlow:
-        return OptionsFlow()
+        return OptionsFlow(config_entry)
 
     async def discover(self, host: str) -> dict:
         logger.info("discovering: %s", host)
@@ -85,18 +86,27 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
 
 class OptionsFlow(config_entries.OptionsFlow):
+    config_entry: config_entries.ConfigEntry
+    options: dict
+
+    def __init__(self, config_entry: config_entries.ConfigEntry) -> None:
+        super().__init__()
+        self.config_entry = config_entry
+        self.options = dict(config_entry.options)
+
     async def async_step_init(self, user_input=None):
+        return await self.async_step_units()
+
+    async def async_step_units(self, user_input=None):
         if user_input is not None:
-            return self.async_create_entry(title="", data=user_input)
+            config = UnitConfig.from_unit_of_measurement(user_input)
+            self.options["units"] = config.as_dict()
+            return await self.finish()
 
         return self.async_show_form(
-            step_id="init",
-            data_schema=vol.Schema(
-                {
-                    vol.Required(
-                        "show_things",
-                        default=self.config_entry.options.get("show_things"),
-                    ): bool
-                }
-            ),
+            step_id="units",
+            data_schema=get_unit_config(self.hass, self.config_entry).data_schema(),
         )
+
+    async def finish(self):
+        return self.async_create_entry(title="", data=self.options)

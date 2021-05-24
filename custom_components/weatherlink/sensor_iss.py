@@ -1,14 +1,6 @@
+from . import units
 from .api import IssCondition
-from .const import (
-    DECIMALS_DIRECTION,
-    DECIMALS_HUMIDITY,
-    DECIMALS_RADIATION,
-    DECIMALS_RAIN_RATE,
-    DECIMALS_RAIN_VOLUME,
-    DECIMALS_SPEED,
-    DECIMALS_TEMPERATURE,
-    DECIMALS_UV,
-)
+from .const import DECIMALS_HUMIDITY, DECIMALS_RADIATION, DECIMALS_UV
 from .sensor_common import WeatherLinkSensor, round_optional
 
 __all__ = [
@@ -73,35 +65,36 @@ class IssStatus(
 class Temperature(
     IssSensor,
     sensor_name="Temperature",
-    unit_of_measurement="°C",
+    unit_of_measurement=units.Temperature,
     device_class="temperature",
 ):
     @property
     def state(self):
-        return round_optional(self._iss_condition.temp, DECIMALS_TEMPERATURE)
+        return self.units.temperature.convert_optional(self._iss_condition.temp)
 
     @property
     def device_state_attributes(self):
         c = self._iss_condition
+        u = self.units.temperature
         return {
-            "dew_point": round_optional(c.dew_point, DECIMALS_TEMPERATURE),
-            "wet_bulb": round_optional(c.wet_bulb, DECIMALS_TEMPERATURE),
-            "heat_index": round_optional(c.heat_index, DECIMALS_TEMPERATURE),
-            "wind_chill": round_optional(c.wind_chill, DECIMALS_TEMPERATURE),
-            "thw_index": round_optional(c.thw_index, DECIMALS_TEMPERATURE),
-            "thsw_index": round_optional(c.thsw_index, DECIMALS_TEMPERATURE),
+            "dew_point": u.convert_optional(c.dew_point),
+            "wet_bulb": u.convert_optional(c.wet_bulb),
+            "heat_index": u.convert_optional(c.heat_index),
+            "wind_chill": u.convert_optional(c.wind_chill),
+            "thw_index": u.convert_optional(c.thw_index),
+            "thsw_index": u.convert_optional(c.thsw_index),
         }
 
 
 class ThswIndex(
     IssSensor,
     sensor_name="THSW index",
-    unit_of_measurement="°C",
+    unit_of_measurement=units.Temperature,
     device_class="temperature",
 ):
     @property
     def state(self):
-        return round_optional(self._iss_condition.thsw_index, DECIMALS_TEMPERATURE)
+        return self.units.temperature.convert_optional(self._iss_condition.thsw_index)
 
 
 class Humidity(
@@ -118,7 +111,7 @@ class Humidity(
 class WindSpeed(
     IssSensor,
     sensor_name="Wind speed",
-    unit_of_measurement="km/h",
+    unit_of_measurement=units.WindSpeed,
     device_class=None,
 ):
     @property
@@ -127,22 +120,23 @@ class WindSpeed(
 
     @property
     def state(self):
-        return round_optional(
-            self._iss_condition.wind_speed_avg_last_2_min, DECIMALS_SPEED
+        return self.units.wind_speed.convert_optional(
+            self._iss_condition.wind_speed_avg_last_2_min
         )
 
     @property
     def device_state_attributes(self):
         c = self._iss_condition
+        u = self.units.wind_speed
         return {
-            "10_min": round_optional(c.wind_speed_avg_last_10_min, DECIMALS_SPEED),
+            "10_min": u.convert_optional(c.wind_speed_avg_last_10_min),
         }
 
 
 class WindMaxSpeed(
     IssSensor,
     sensor_name="Wind max speed",
-    unit_of_measurement="km/h",
+    unit_of_measurement=units.WindSpeed,
     device_class=None,
 ):
     @property
@@ -151,15 +145,16 @@ class WindMaxSpeed(
 
     @property
     def state(self):
-        return round_optional(
-            self._iss_condition.wind_speed_hi_last_2_min, DECIMALS_SPEED
+        return self.units.wind_speed.convert_optional(
+            self._iss_condition.wind_speed_hi_last_2_min
         )
 
     @property
     def device_state_attributes(self):
         c = self._iss_condition
+        u = self.units.wind_speed
         return {
-            "10_min": round_optional(c.wind_speed_hi_last_10_min, DECIMALS_SPEED),
+            "10_min": u.convert_optional(c.wind_speed_hi_last_10_min),
         }
 
 
@@ -175,23 +170,15 @@ class WindBearing(
 
     @property
     def state(self):
-        return round_optional(
-            self._iss_condition.wind_dir_scalar_avg_last_2_min, DECIMALS_DIRECTION
-        )
+        return self._iss_condition.wind_dir_scalar_avg_last_2_min
 
     @property
     def device_state_attributes(self):
         c = self._iss_condition
         return {
-            "high": round_optional(
-                c.wind_dir_at_hi_speed_last_2_min, DECIMALS_DIRECTION
-            ),
-            "10_min": round_optional(
-                c.wind_dir_scalar_avg_last_10_min, DECIMALS_DIRECTION
-            ),
-            "10_min_high": round_optional(
-                c.wind_dir_at_hi_speed_last_10_min, DECIMALS_DIRECTION
-            ),
+            "high": c.wind_dir_at_hi_speed_last_2_min,
+            "10_min": c.wind_dir_scalar_avg_last_10_min,
+            "10_min_high": c.wind_dir_at_hi_speed_last_10_min,
         }
 
 
@@ -213,7 +200,7 @@ class SolarRad(
 class UvIndex(
     IssSensor,
     sensor_name="UV index",
-    unit_of_measurement=None,
+    unit_of_measurement="UV Index",
     device_class=None,
 ):
     @property
@@ -228,7 +215,7 @@ class UvIndex(
 class RainRate(
     IssSensor,
     sensor_name="Rain rate",
-    unit_of_measurement="mm/h",
+    unit_of_measurement=units.RainRate,
     device_class=None,
 ):
     @property
@@ -237,21 +224,22 @@ class RainRate(
 
     @property
     def state(self):
-        return round(self._iss_condition.rain_rate_last, DECIMALS_RAIN_RATE)
+        return self.units.rain_rate.convert(self._iss_condition.rain_rate_last)
 
     @property
     def device_state_attributes(self):
         c = self._iss_condition
+        u = self.units.rain_rate
         return {
-            "high": round_optional(c.rain_rate_hi, DECIMALS_RAIN_RATE),
-            "15_min_high": round(c.rain_rate_hi_last_15_min, DECIMALS_RAIN_RATE),
+            "high": u.convert_optional(c.rain_rate_hi),
+            "15_min_high": u.convert(c.rain_rate_hi_last_15_min),
         }
 
 
 class Rainfall(
     IssSensor,
     sensor_name="Rainfall",
-    unit_of_measurement="mm",
+    unit_of_measurement=units.Rainfall,
     device_class=None,
 ):
     @property
@@ -260,24 +248,25 @@ class Rainfall(
 
     @property
     def state(self):
-        return round(self._iss_condition.rainfall_daily, DECIMALS_RAIN_VOLUME)
+        return self.units.rainfall.convert(self._iss_condition.rainfall_daily)
 
     @property
     def device_state_attributes(self):
         c = self._iss_condition
+        u = self.units.rainfall
         return {
-            "15_min": round_optional(c.rainfall_last_15_min, DECIMALS_RAIN_VOLUME),
-            "60_min": round_optional(c.rainfall_last_60_min, DECIMALS_RAIN_VOLUME),
-            "24_hr": round_optional(c.rainfall_last_24_hr, DECIMALS_RAIN_VOLUME),
-            "monthly": round(c.rainfall_monthly, DECIMALS_RAIN_VOLUME),
-            "yearly": round(c.rainfall_year, DECIMALS_RAIN_VOLUME),
+            "15_min": u.convert_optional(c.rainfall_last_15_min),
+            "60_min": u.convert_optional(c.rainfall_last_60_min),
+            "24_hr": u.convert_optional(c.rainfall_last_24_hr),
+            "monthly": u.convert(c.rainfall_monthly),
+            "yearly": u.convert(c.rainfall_year),
         }
 
 
 class Rainstorm(
     IssSensor,
     sensor_name="Rainstorm",
-    unit_of_measurement="mm",
+    unit_of_measurement=units.Rainfall,
     device_class=None,
 ):
     @property
@@ -286,14 +275,15 @@ class Rainstorm(
 
     @property
     def state(self):
-        return round_optional(self._iss_condition.rain_storm, DECIMALS_RAIN_VOLUME)
+        return self.units.rainfall.convert_optional(self._iss_condition.rain_storm)
 
     @property
     def device_state_attributes(self):
         c = self._iss_condition
+        u = self.units.rainfall
         return {
             "start": c.rain_storm_start_at,
-            "last": round_optional(c.rain_storm_last, DECIMALS_RAIN_VOLUME),
+            "last": u.convert_optional(c.rain_storm_last),
             "last_start": c.rain_storm_last_start_at,
             "last_end": c.rain_storm_last_end_at,
         }
