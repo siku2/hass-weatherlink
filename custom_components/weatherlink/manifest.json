@@ -2,6 +2,8 @@
   "domain": "weatherlink",
   "name": "WeatherLink",
   "version": "0.2.1",
+  "documentation": "https://github.com/siku2/hass-weatherlink",
+  "issue_tracker": "https://github.com/siku2/hass-weatherlink/issues",
   "codeowners": [
     "@siku2"
   ],
@@ -11,5 +13,6 @@
   "zeroconf": [
     "_airlink._tcp.local.",
     "_weatherlinklive._tcp.local."
-  ]
+  ],
+  "iot_class": "local_polling"
 }
