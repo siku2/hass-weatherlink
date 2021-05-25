@@ -21,6 +21,20 @@ async def async_setup(hass, _config):
     return True
 
 
+def get_update_interval(entry: ConfigEntry) -> timedelta:
+    seconds = 30.0
+    try:
+        seconds = float(entry.options["update_interval"])
+    except KeyError:
+        logger.info("no update_interval set, using default")
+    except Exception:
+        logger.exception(
+            f"failed to read update_interval from options: {entry.options!r}"
+        )
+
+    return timedelta(seconds=seconds)
+
+
 class WeatherLinkCoordinator(DataUpdateCoordinator):
     session: WeatherLinkSession
     units: UnitConfig
@@ -32,6 +46,7 @@ class WeatherLinkCoordinator(DataUpdateCoordinator):
 
     async def __update_config(self, hass: HomeAssistant, entry: ConfigEntry):
         self.units = get_unit_config(hass, entry)
+        self.update_interval = get_update_interval(entry)
 
     async def __initalize(
         self, session: WeatherLinkSession, entry: ConfigEntry
@@ -57,7 +72,7 @@ class WeatherLinkCoordinator(DataUpdateCoordinator):
             hass,
             logger,
             name="state",
-            update_interval=timedelta(seconds=30),
+            update_interval=get_update_interval(entry),
         )
         await coordinator.__initalize(session, entry)
 
