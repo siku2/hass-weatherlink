@@ -1,3 +1,5 @@
+from typing import Optional
+
 from . import units
 from .api import IssCondition
 from .const import DECIMALS_HUMIDITY, DECIMALS_RADIATION, DECIMALS_UV
@@ -180,6 +182,56 @@ class WindBearing(
             "10_min": c.wind_dir_scalar_avg_last_10_min,
             "10_min_high": c.wind_dir_at_hi_speed_last_10_min,
         }
+
+
+class WindDirection(
+    IssSensor,
+    sensor_name="Wind direction",
+    unit_of_measurement=None,
+    device_class=None,
+):
+    _DIRECTIONS = (
+        "N",
+        "NNE",
+        "NE",
+        "ENE",
+        "E",
+        "ESE",
+        "SE",
+        "SSE",
+        "S",
+        "SSW",
+        "SW",
+        "WSW",
+        "W",
+        "WNW",
+        "NW",
+        "NNW",
+        "N",
+    )
+
+    @property
+    def icon(self):
+        return "mdi:compass"
+
+    @property
+    def state(self):
+        return self.bearing_to_dir(self._iss_condition.wind_dir_scalar_avg_last_2_min)
+
+    @property
+    def device_state_attributes(self):
+        c = self._iss_condition
+        return {
+            "high": self.bearing_to_dir(c.wind_dir_at_hi_speed_last_2_min),
+            "10_min": self.bearing_to_dir(c.wind_dir_scalar_avg_last_10_min),
+            "10_min_high": self.bearing_to_dir(c.wind_dir_at_hi_speed_last_10_min),
+        }
+
+    @classmethod
+    def bearing_to_dir(cls, deg: Optional[int]) -> Optional[str]:
+        if deg is None:
+            return None
+        return cls._DIRECTIONS[int(((deg % 360) + 11.25) / 22.5)]
 
 
 class SolarRad(
