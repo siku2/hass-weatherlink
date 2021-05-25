@@ -21,6 +21,12 @@
   },
   "options": {
     "step": {
+      "misc": {
+        "title": "Misc",
+        "data": {
+          "update_interval": "Update interval"
+        }
+      },
       "units": {
         "title": "Units",
         "data": {
@@ -32,6 +38,9 @@
           "rainfall": "Rain volume"
         }
       }
+    },
+    "error": {
+      "invalid_time_period": "Invalid time period"
     }
   }
 }

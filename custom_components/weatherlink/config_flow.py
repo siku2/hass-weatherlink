@@ -5,6 +5,7 @@ from typing import Any, Dict
 import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.helpers import aiohttp_client
+from homeassistant.helpers import config_validation as cv
 
 from .api import WeatherLinkSession
 from .const import DOMAIN
@@ -95,7 +96,34 @@ class OptionsFlow(config_entries.OptionsFlow):
         self.options = dict(config_entry.options)
 
     async def async_step_init(self, user_input=None):
-        return await self.async_step_units()
+        return await self.async_step_misc()
+
+    async def async_step_misc(self, user_input=None):
+        from . import get_update_interval
+
+        errors = {}
+        if user_input is not None:
+            try:
+                self.options["update_interval"] = cv.time_period_str(
+                    user_input["update_interval"]
+                ).total_seconds()
+            except vol.Error:
+                errors["update_interval"] = "invalid_time_period"
+            else:
+                return await self.async_step_units()
+
+        return self.async_show_form(
+            step_id="misc",
+            data_schema=vol.Schema(
+                {
+                    vol.Required(
+                        "update_interval",
+                        default=str(get_update_interval(self.config_entry)),
+                    ): str
+                }
+            ),
+            errors=errors,
+        )
 
     async def async_step_units(self, user_input=None):
         if user_input is not None:
