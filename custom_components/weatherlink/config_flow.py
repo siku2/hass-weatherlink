@@ -89,6 +89,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 class OptionsFlow(config_entries.OptionsFlow):
     config_entry: config_entries.ConfigEntry
     options: dict
+    units_config: dict
 
     def __init__(self, config_entry: config_entries.ConfigEntry) -> None:
         super().__init__()
@@ -127,13 +128,23 @@ class OptionsFlow(config_entries.OptionsFlow):
 
     async def async_step_units(self, user_input=None):
         if user_input is not None:
-            config = UnitConfig.from_unit_of_measurement(user_input)
+            self.units_config = user_input
+            return await self.async_step_rounding()
+
+        return self.async_show_form(
+            step_id="units",
+            data_schema=get_unit_config(self.hass, self.config_entry).units_schema(),
+        )
+
+    async def async_step_rounding(self, user_input=None):
+        if user_input is not None:
+            config = UnitConfig.from_config_flow(self.units_config, user_input)
             self.options["units"] = config.as_dict()
             return await self.finish()
 
         return self.async_show_form(
-            step_id="units",
-            data_schema=get_unit_config(self.hass, self.config_entry).data_schema(),
+            step_id="rounding",
+            data_schema=get_unit_config(self.hass, self.config_entry).rounding_schema(),
         )
 
     async def finish(self):

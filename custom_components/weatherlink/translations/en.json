@@ -23,12 +23,26 @@
     "step": {
       "misc": {
         "title": "Misc",
+        "description": "(1 / 3)",
         "data": {
           "update_interval": "Update interval"
         }
       },
       "units": {
         "title": "Units",
+        "description": "(2 / 3)",
+        "data": {
+          "temperature": "Temperature",
+          "pressure": "Pressure",
+          "wind_speed": "Wind Speed",
+          "pm": "Pm",
+          "rain_rate": "Rain rate",
+          "rainfall": "Rain volume"
+        }
+      },
+      "rounding": {
+        "title": "Rounding",
+        "description": "(3 / 3)",
         "data": {
           "temperature": "Temperature",
           "pressure": "Pressure",

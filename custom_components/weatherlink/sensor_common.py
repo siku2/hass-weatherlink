@@ -4,7 +4,7 @@ from typing import Iterable, Iterator, List, Optional, Type, Union
 
 from . import WeatherLinkCoordinator, WeatherLinkEntity
 from .api import ConditionRecord, CurrentConditions
-from .units import Units
+from .units import Measurement
 
 logger = logging.getLogger(__name__)
 
@@ -17,7 +17,7 @@ class WeatherLinkSensor(WeatherLinkEntity):
         cls,
         *,
         sensor_name: str,
-        unit_of_measurement: Union[str, Type[Units], None],
+        unit_of_measurement: Union[str, Type[Measurement], None],
         device_class: Optional[str],
         required_conditions: Iterable[Type[ConditionRecord]] = None,
         **kwargs,
@@ -89,7 +89,7 @@ class WeatherLinkSensor(WeatherLinkEntity):
         if unit is None or isinstance(unit, str):
             return unit
 
-        return self.units.by_units(unit).unit_of_measurement
+        return self.units.by_measurement(unit).info.unit_of_measurement
 
     @property
     def device_class(self):

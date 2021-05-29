@@ -538,18 +538,15 @@ class WeatherLinkSession:
 
 
 def fahrenheit_to_celsius(value: float) -> float:
-    c = (value - 32) * 5 / 9
-    return round(c, 3)
+    return (value - 32) * 5 / 9
 
 
 def mph_to_kph(value: float) -> float:
-    kph = 1.60934 * value
-    return round(kph, 3)
+    return 1.609344 * value
 
 
 def in_hg_to_hpa(value: float) -> float:
-    hpa = 33.86389 * value
-    return round(hpa, 3)
+    return 33.86389 * value
 
 
 def json_apply_converters(d: JsonObject, **converters: Callable[[Any], Any]) -> None:
