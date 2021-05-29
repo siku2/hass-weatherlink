@@ -33,7 +33,7 @@ class Weather(WeatherEntity, WeatherLinkEntity):
 
     @property
     def temperature_unit(self):
-        return self.units.temperature.unit_of_measurement
+        return self.units.temperature.info.unit_of_measurement
 
     @property
     def pressure(self):
