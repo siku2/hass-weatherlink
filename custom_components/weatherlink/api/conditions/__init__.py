@@ -42,6 +42,9 @@ class DeviceType(enum.Enum):
     WeatherLink = "WeatherLink"
     AirLink = "AirLink"
 
+    def supports_real_time_api(self) -> bool:
+        return self != self.AirLink
+
 
 RecordT = TypeVar("RecordT", bound=ConditionRecord)
 

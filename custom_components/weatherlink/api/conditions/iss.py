@@ -34,55 +34,6 @@ class CollectorSize(enum.IntEnum):
 class IssCondition(ConditionRecord):
     txid: int
     """transmitter ID"""
-    rx_state: Optional[ReceiverState]
-    """configured radio receiver state"""
-
-    temp: Optional[float]
-    """most recent valid temperature"""
-    hum: Optional[float]
-    """most recent valid humidity **(%RH)**"""
-    dew_point: Optional[float]
-    """"""
-    wet_bulb: Optional[float]
-    """"""
-    heat_index: Optional[float]
-    """"""
-    wind_chill: Optional[float]
-    """"""
-    thw_index: Optional[float]
-    """"""
-    thsw_index: Optional[float]
-    """"""
-
-    wind_speed_last: Optional[float]
-    """most recent valid wind speed **(km/h)**"""
-    wind_dir_last: Optional[int]
-    """most recent valid wind direction **(°degree)**"""
-
-    wind_speed_avg_last_1_min: Optional[float]
-    """average wind speed over last 1 min **(km/h)**"""
-    wind_dir_scalar_avg_last_1_min: Optional[int]
-    """scalar average wind direction over last 1 min **(°degree)**"""
-
-    wind_speed_avg_last_2_min: Optional[float]
-    """average wind speed over last 2 min **(km/h)**"""
-    wind_dir_scalar_avg_last_2_min: Optional[int]
-    """scalar average wind direction over last 2 min **(°degree)**"""
-
-    wind_speed_hi_last_2_min: Optional[float]
-    """maximum wind speed over last 2 min **(km/h)**"""
-    wind_dir_at_hi_speed_last_2_min: Optional[int]
-    """gust wind direction over last 2 min **(°degree)**"""
-
-    wind_speed_avg_last_10_min: Optional[float]
-    """average wind speed over last 10 min **(km/h)**"""
-    wind_dir_scalar_avg_last_10_min: Optional[int]
-    """scalar average wind direction over last 10 min **(°degree)**"""
-
-    wind_speed_hi_last_10_min: Optional[float]
-    """maximum wind speed over last 10 min **(km/h)**"""
-    wind_dir_at_hi_speed_last_10_min: Optional[int]
-    """gust wind direction over last 10 min **(°degree)**"""
 
     rain_size: CollectorSize
     """rain collector type/size"""
@@ -90,37 +41,6 @@ class IssCondition(ConditionRecord):
     rain_rate_last: float
     rain_rate_last_counts: int
     """most recent valid rain rate **(counts/hour)**"""
-    rain_rate_hi: Optional[float]
-    rain_rate_hi_counts: Optional[int]
-    """highest rain rate over last 1 min **(counts/hour)**"""
-
-    rainfall_last_15_min: Optional[float]
-    rainfall_last_15_min_counts: Optional[int]
-    """total rain count over last 15 min **(counts)**"""
-    rain_rate_hi_last_15_min: float
-    rain_rate_hi_last_15_min_counts: int
-    """highest rain rate over last 15 min **(counts/hour)**"""
-
-    rainfall_last_60_min: Optional[float]
-    rainfall_last_60_min_counts: Optional[int]
-    """total rain count for last 60 min **(counts)**"""
-    rainfall_last_24_hr: Optional[float]
-    rainfall_last_24_hr_counts: Optional[int]
-    """total rain count for last 24 hours **(counts)**"""
-
-    rain_storm: Optional[float]
-    rain_storm_counts: Optional[int]
-    """total rain count since last 24 hour long break in rain **(counts)**"""
-    rain_storm_start_at: Optional[datetime]
-    """timestamp of current rain storm start"""
-
-    solar_rad: Optional[int]
-    """most recent solar radiation **(W/m²)**"""
-    uv_index: Optional[float]
-    """most recent UV index **(Index)**"""
-
-    trans_battery_flag: int
-    """transmitter battery status flag"""
 
     rainfall_daily: float
     rainfall_daily_counts: int
@@ -132,18 +52,105 @@ class IssCondition(ConditionRecord):
     rainfall_year_counts: int
     """total rain count since first of user-chosen month at local midnight **(counts)**"""
 
-    rain_storm_last: Optional[float]
-    rain_storm_last_counts: Optional[int]
+    rx_state: Optional[ReceiverState] = None
+    """configured radio receiver state"""
+
+    temp: Optional[float] = None
+    """most recent valid temperature"""
+    hum: Optional[float] = None
+    """most recent valid humidity **(%RH)**"""
+    dew_point: Optional[float] = None
+    """"""
+    wet_bulb: Optional[float] = None
+    """"""
+    heat_index: Optional[float] = None
+    """"""
+    wind_chill: Optional[float] = None
+    """"""
+    thw_index: Optional[float] = None
+    """"""
+    thsw_index: Optional[float] = None
+    """"""
+
+    wind_speed_last: Optional[float] = None
+    """most recent valid wind speed **(km/h)**"""
+    wind_dir_last: Optional[int] = None
+    """most recent valid wind direction **(°degree)**"""
+
+    wind_speed_avg_last_1_min: Optional[float] = None
+    """average wind speed over last 1 min **(km/h)**"""
+    wind_dir_scalar_avg_last_1_min: Optional[int] = None
+    """scalar average wind direction over last 1 min **(°degree)**"""
+
+    wind_speed_avg_last_2_min: Optional[float] = None
+    """average wind speed over last 2 min **(km/h)**"""
+    wind_dir_scalar_avg_last_2_min: Optional[int] = None
+    """scalar average wind direction over last 2 min **(°degree)**"""
+
+    wind_speed_hi_last_2_min: Optional[float] = None
+    """maximum wind speed over last 2 min **(km/h)**"""
+    wind_dir_at_hi_speed_last_2_min: Optional[int] = None
+    """gust wind direction over last 2 min **(°degree)**"""
+
+    wind_speed_avg_last_10_min: Optional[float] = None
+    """average wind speed over last 10 min **(km/h)**"""
+    wind_dir_scalar_avg_last_10_min: Optional[int] = None
+    """scalar average wind direction over last 10 min **(°degree)**"""
+
+    wind_speed_hi_last_10_min: Optional[float] = None
+    """maximum wind speed over last 10 min **(km/h)**"""
+    wind_dir_at_hi_speed_last_10_min: Optional[int] = None
+    """gust wind direction over last 10 min **(°degree)**"""
+
+    rain_rate_hi: Optional[float] = None
+    rain_rate_hi_counts: Optional[int] = None
+    """highest rain rate over last 1 min **(counts/hour)**"""
+    rain_rate_hi_last_15_min: Optional[float] = None
+    rain_rate_hi_last_15_min_counts: Optional[int] = None
+    """highest rain rate over last 15 min **(counts/hour)**"""
+
+    rainfall_last_15_min: Optional[float] = None
+    rainfall_last_15_min_counts: Optional[int] = None
+    """total rain count over last 15 min **(counts)**"""
+    rainfall_last_60_min: Optional[float] = None
+    rainfall_last_60_min_counts: Optional[int] = None
+    """total rain count for last 60 min **(counts)**"""
+    rainfall_last_24_hr: Optional[float] = None
+    rainfall_last_24_hr_counts: Optional[int] = None
+    """total rain count for last 24 hours **(counts)**"""
+
+    rain_storm: Optional[float] = None
+    rain_storm_counts: Optional[int] = None
     """total rain count since last 24 hour long break in rain **(counts)**"""
-    rain_storm_last_start_at: Optional[datetime]
+    rain_storm_start_at: Optional[datetime] = None
+    """timestamp of current rain storm start"""
+
+    solar_rad: Optional[int] = None
+    """most recent solar radiation **(W/m²)**"""
+    uv_index: Optional[float] = None
+    """most recent UV index **(Index)**"""
+
+    trans_battery_flag: Optional[int] = None
+    """transmitter battery status flag"""
+
+    rain_storm_last: Optional[float] = None
+    rain_storm_last_counts: Optional[int] = None
+    """total rain count since last 24 hour long break in rain **(counts)**"""
+    rain_storm_last_start_at: Optional[datetime] = None
     """timestamp of last rain storm start **(sec)**"""
-    rain_storm_last_end_at: Optional[datetime]
+    rain_storm_last_end_at: Optional[datetime] = None
     """timestamp of last rain storm end **(sec)**"""
 
     @classmethod
     def _from_json(cls, data: from_json.JsonObject, **kwargs):
         collector = CollectorSize(data["rain_size"])
         data["rain_size"] = collector
+        from_json.keys_from_aliases(
+            data,
+            rainfall_last_15_min="rain_15_min",
+            rainfall_last_60_min="rain_60_min",
+            rainfall_last_24_hr="rain_24_hr",
+        )
         keys_counts_to_mm(
             data,
             collector,

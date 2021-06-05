@@ -70,12 +70,13 @@ class WeatherLinkRest:
             self.base_url + EP_REAL_TIME,
             params={"duration": int(duration.total_seconds())},
         ) as resp:
-            peername = resp.connection.transport.get_extra_info("peername")
-            if not isinstance(peername, str):
+            peername_raw = resp.connection.transport.get_extra_info("peername")
+            if peername_raw is None:
                 raise ValueError("failed to get peername from request")
 
             body = await resp.json()
 
         broadcast_resp = parse_from_json(RealTimeBroadcastResponse, body)
-        broadcast_resp.addr = peername
+        server_addr, _ = peername_raw
+        broadcast_resp.addr = server_addr
         return broadcast_resp

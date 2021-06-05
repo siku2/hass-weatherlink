@@ -1,5 +1,7 @@
+import asyncio
 import logging
 from datetime import timedelta
+from typing import Optional
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
@@ -9,7 +11,7 @@ from homeassistant.helpers.update_coordinator import (
     DataUpdateCoordinator,
 )
 
-from .api import CurrentConditions, WeatherLinkRest
+from .api import CurrentConditions, WeatherLinkBroadcast, WeatherLinkRest
 from .const import DOMAIN, PLATFORMS
 from .units import UnitConfig, get_unit_config
 
@@ -35,7 +37,8 @@ def get_update_interval(entry: ConfigEntry) -> timedelta:
     return timedelta(seconds=seconds)
 
 
-MAX_FAIL_COUNTER = 3
+MAX_FAIL_COUNTER: int = 3
+FAIL_TIMEOUT: float = 3.0
 
 
 class WeatherLinkCoordinator(DataUpdateCoordinator[CurrentConditions]):
@@ -46,7 +49,7 @@ class WeatherLinkCoordinator(DataUpdateCoordinator[CurrentConditions]):
     device_name: str
     device_model_name: str
 
-    _fail_counter: int
+    __broadcast_task: Optional[asyncio.Task]
 
     async def __update_config(self, hass: HomeAssistant, entry: ConfigEntry):
         self.units = get_unit_config(hass, entry)
@@ -58,34 +61,59 @@ class WeatherLinkCoordinator(DataUpdateCoordinator[CurrentConditions]):
         await self.__update_config(self.hass, entry)
 
         self.update_method = self.__fetch_data
-        await self.__fetch_data()
-
-        conditions = self.data
+        conditions = self.data = await self.__fetch_data()
+        if conditions is None:
+            raise RuntimeError(f"failed to get conditions from {session.base_url!r}")
         self.device_did = conditions.did
-        self.device_model_name = conditions.determine_device_type().value
+        device_type = conditions.determine_device_type()
+        self.device_model_name = device_type.value
         self.device_name = conditions.determine_device_name()
 
-        self._fail_counter = 0
+        if device_type.supports_real_time_api():
+            logger.info("starting live broadcast listener")
+            self.__broadcast_task = asyncio.create_task(
+                self.__broadcast_loop(), name="broadcast listener loop"
+            )
+        else:
+            self.__broadcast_task = None
 
     async def __fetch_data(self) -> CurrentConditions:
-        try:
-            conditions = await self.session.current_conditions()
-        except Exception:
-            self._fail_counter += 1
-            if self._fail_counter > MAX_FAIL_COUNTER:
-                raise
-
-            logger.warning(
-                "failed to get current conditions, error %s / %s",
-                self._fail_counter,
-                MAX_FAIL_COUNTER,
-            )
-            # reuse previous data
-            conditions = self.data
+        for i in range(MAX_FAIL_COUNTER):
+            try:
+                conditions = await self.session.current_conditions()
+            except Exception as exc:
+                logger.warning(
+                    "failed to get current conditions, error %s / %s",
+                    i + 1,
+                    MAX_FAIL_COUNTER,
+                    exc_info=exc,
+                )
+                await asyncio.sleep(FAIL_TIMEOUT)
+            else:
+                break
         else:
-            self._fail_counter = 0
+            conditions = self.data
 
         return conditions
+
+    async def __broadcast_loop_once(self, broadcast: WeatherLinkBroadcast) -> None:
+        conditions = await broadcast.read()
+        logger.debug("received broadcast conditions")
+
+    async def __broadcast_loop(self) -> None:
+        try:
+            broadcast = await WeatherLinkBroadcast.start(self.session)
+        except Exception:
+            logger.exception("failed to start broadcast")
+            return
+        try:
+            while True:
+                try:
+                    await self.__broadcast_loop_once(broadcast)
+                except Exception:
+                    logger.exception("failed to read broadcast")
+        finally:
+            await broadcast.stop()
 
     @classmethod
     async def build(cls, hass, session: WeatherLinkRest, entry: ConfigEntry):

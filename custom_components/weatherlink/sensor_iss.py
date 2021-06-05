@@ -284,7 +284,7 @@ class RainRate(
         u = self.units.rain_rate
         return {
             "high": u.convert_optional(c.rain_rate_hi),
-            "15_min_high": u.convert(c.rain_rate_hi_last_15_min),
+            "15_min_high": u.convert_optional(c.rain_rate_hi_last_15_min),
         }
 
 

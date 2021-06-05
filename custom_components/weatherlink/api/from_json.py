@@ -1,7 +1,7 @@
 import abc
 import logging
 from datetime import datetime
-from typing import Any, Callable, Dict, Type, TypeVar
+from typing import Any, Callable, Dict, Iterable, Type, TypeVar, Union
 
 __all__ = [
     "FromJson",
@@ -79,10 +79,35 @@ def keys_to_hpa(d: JsonObject, *keys: str) -> None:
     apply_converters(d, **{key: in_hg_to_hpa for key in keys})
 
 
-def keys_set_default_none(d: JsonObject, *keys: str) -> None:
+def remove_optional_keys(d: JsonObject, *keys: str) -> None:
     for key in keys:
-        if key not in d:
-            d[key] = None
+        try:
+            del d[key]
+        except KeyError:
+            continue
+
+
+def keys_from_aliases(d: JsonObject, **key_aliases: Union[str, Iterable[str]]) -> None:
+    for key, aliases in key_aliases.items():
+        if key in d:
+            continue
+
+        if isinstance(aliases, str):
+            aliases = (aliases,)
+
+        for alias in aliases:
+            try:
+                value = d[alias]
+            except KeyError:
+                continue
+
+            d[key] = value
+            break
+
+    for aliases in key_aliases.values():
+        if isinstance(aliases, str):
+            aliases = (aliases,)
+        remove_optional_keys(d, *aliases)
 
 
 def update_dict_where_none(d: JsonObject, updates: JsonObject) -> None:

@@ -214,3 +214,38 @@ def test_parse_02():
     assert data[LssBarCondition]
 
     assert data[IssCondition].wind_dir_last == 252
+
+
+def test_parse_live() -> None:
+    payload = json.loads(
+        """
+            {
+                "did": "001D0A7139D6",
+                "ts": 1622919120,
+                "conditions": [
+                    {
+                        "lsid": 380030,
+                        "data_structure_type": 1,
+                        "txid": 1,
+                        "wind_speed_last": 0.0,
+                        "wind_dir_last": 0,
+                        "rain_size": 2,
+                        "rain_rate_last": 0,
+                        "rain_15_min": 0,
+                        "rain_60_min": 0,
+                        "rain_24_hr": 199,
+                        "rain_storm": 202,
+                        "rain_storm_start_at": 1622784421,
+                        "rainfall_daily": 54,
+                        "rainfall_monthly": 204,
+                        "rainfall_year": 2399,
+                        "wind_speed_hi_last_10_min": 0.0,
+                        "wind_dir_at_hi_speed_last_10_min": 0
+                    }
+                ]
+            }
+        """
+    )
+
+    data = CurrentConditions.from_json(payload, strict=True)
+    assert data[IssCondition]
