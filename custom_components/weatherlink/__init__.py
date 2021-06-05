@@ -35,14 +35,18 @@ def get_update_interval(entry: ConfigEntry) -> timedelta:
     return timedelta(seconds=seconds)
 
 
-class WeatherLinkCoordinator(DataUpdateCoordinator):
+MAX_FAIL_COUNTER = 3
+
+
+class WeatherLinkCoordinator(DataUpdateCoordinator[CurrentConditions]):
     session: WeatherLinkSession
     units: UnitConfig
-    current_conditions: CurrentConditions
 
     device_did: str
     device_name: str
     device_model_name: str
+
+    _fail_counter: int
 
     async def __update_config(self, hass: HomeAssistant, entry: ConfigEntry):
         self.units = get_unit_config(hass, entry)
@@ -58,13 +62,32 @@ class WeatherLinkCoordinator(DataUpdateCoordinator):
         self.update_method = self.__fetch_data
         await self.__fetch_data()
 
-        conditions = self.current_conditions
+        conditions = self.data
         self.device_did = conditions.did
         self.device_model_name = conditions.determine_device_type().value
         self.device_name = conditions.determine_device_name()
 
-    async def __fetch_data(self) -> None:
-        self.current_conditions = await self.session.current_conditions()
+        self._fail_counter = 0
+
+    async def __fetch_data(self) -> CurrentConditions:
+        try:
+            conditions = await self.session.current_conditions()
+        except Exception:
+            self._fail_counter += 1
+            if self._fail_counter > MAX_FAIL_COUNTER:
+                raise
+
+            logger.warning(
+                "failed to get current conditions, error %s / %s",
+                self._fail_counter,
+                MAX_FAIL_COUNTER,
+            )
+            # reuse previous data
+            conditions = self.data
+        else:
+            self._fail_counter = 0
+
+        return conditions
 
     @classmethod
     async def build(cls, hass, session: WeatherLinkSession, entry: ConfigEntry):
@@ -118,7 +141,7 @@ class WeatherLinkEntity(CoordinatorEntity):
 
     @property
     def _conditions(self) -> CurrentConditions:
-        return self.coordinator.current_conditions
+        return self.coordinator.data
 
     @property
     def units(self) -> UnitConfig:
