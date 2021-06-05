@@ -16,6 +16,12 @@ logger = logging.getLogger(__name__)
 
 FORM_SCHEMA = vol.Schema({vol.Required("host"): str})
 
+KEY_LISTEN_TO_BROADCASTS = "listen_to_broadcasts"
+
+
+def get_listen_to_broadcasts(config_entry: config_entries.ConfigEntry) -> bool:
+    return config_entry.options.get(KEY_LISTEN_TO_BROADCASTS, True)
+
 
 @dataclasses.dataclass()
 class FormError(Exception):
@@ -110,6 +116,9 @@ class OptionsFlow(config_entries.OptionsFlow):
 
         errors = {}
         if user_input is not None:
+            self.options[KEY_LISTEN_TO_BROADCASTS] = user_input[
+                KEY_LISTEN_TO_BROADCASTS
+            ]
             try:
                 self.options["update_interval"] = cv.time_period_str(
                     user_input["update_interval"]
@@ -126,7 +135,11 @@ class OptionsFlow(config_entries.OptionsFlow):
                     vol.Required(
                         "update_interval",
                         default=str(get_update_interval(self.config_entry)),
-                    ): str
+                    ): str,
+                    vol.Required(
+                        KEY_LISTEN_TO_BROADCASTS,
+                        default=get_listen_to_broadcasts(self.config_entry),
+                    ): bool,
                 }
             ),
             errors=errors,

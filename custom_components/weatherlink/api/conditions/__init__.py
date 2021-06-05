@@ -122,6 +122,16 @@ class CurrentConditions(from_json.FromJson, Mapping[Type[RecordT], RecordT]):
         model_name = self.determine_device_type().name
         return f"{model_name} {self.did}"
 
+    def update_from(self, other: "CurrentConditions") -> None:
+        for other_condition in other:
+            condition_cls = type(other_condition)
+            try:
+                condition: ConditionRecord = self[condition_cls]
+            except KeyError:
+                self.conditions.append(other_condition)
+            else:
+                condition.update_from(other_condition)
+
 
 _STRUCTURE_TYPE_KEY = "data_structure_type"
 

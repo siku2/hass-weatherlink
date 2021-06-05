@@ -26,6 +26,9 @@ class Protocol(asyncio.DatagramProtocol):
         self.queue = asyncio.Queue(queue_size)
         self.connection_lost_fut = asyncio.Future()
 
+    def __str__(self) -> str:
+        return f"<{type(self).__qualname__} {self.remote_addr=!r}>"
+
     @classmethod
     async def open(cls, remote_addr: str, *, addr: str, port: int, **kwargs):
         loop = asyncio.get_running_loop()
@@ -40,7 +43,7 @@ class Protocol(asyncio.DatagramProtocol):
         self.transport = transport
 
     def connection_lost(self, exc: Optional[Exception]) -> None:
-        logger.debug("%s connection lost", self)
+        logger.debug("%s connection lost with error: %s", self, exc)
         self.connection_lost_fut.set_result(exc)
 
     def __queue_put(self, item: Any) -> None:

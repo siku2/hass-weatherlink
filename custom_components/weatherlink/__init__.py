@@ -12,6 +12,8 @@ from homeassistant.helpers.update_coordinator import (
 )
 
 from .api import CurrentConditions, WeatherLinkBroadcast, WeatherLinkRest
+from .api.conditions import DeviceType
+from .config_flow import get_listen_to_broadcasts
 from .const import DOMAIN, PLATFORMS
 from .units import UnitConfig, get_unit_config
 
@@ -45,37 +47,44 @@ class WeatherLinkCoordinator(DataUpdateCoordinator[CurrentConditions]):
     session: WeatherLinkRest
     units: UnitConfig
 
+    _device_type: DeviceType
     device_did: str
     device_name: str
     device_model_name: str
 
-    __broadcast_task: Optional[asyncio.Task]
+    __broadcast_task: Optional[asyncio.Task] = None
 
     async def __update_config(self, hass: HomeAssistant, entry: ConfigEntry):
         self.units = get_unit_config(hass, entry)
         self.update_interval = get_update_interval(entry)
 
-    async def __initalize(self, session: WeatherLinkRest, entry: ConfigEntry) -> None:
-        self.session = session
-        entry.add_update_listener(self.__update_config)
-        await self.__update_config(self.hass, entry)
-
-        self.update_method = self.__fetch_data
-        conditions = self.data = await self.__fetch_data()
-        if conditions is None:
-            raise RuntimeError(f"failed to get conditions from {session.base_url!r}")
-        self.device_did = conditions.did
-        device_type = conditions.determine_device_type()
-        self.device_model_name = device_type.value
-        self.device_name = conditions.determine_device_name()
-
-        if device_type.supports_real_time_api():
+        if self._device_type.supports_real_time_api() and get_listen_to_broadcasts(
+            entry
+        ):
             logger.info("starting live broadcast listener")
             self.__broadcast_task = asyncio.create_task(
                 self.__broadcast_loop(), name="broadcast listener loop"
             )
         else:
+            if self.__broadcast_task:
+                logger.debug("stopping current broadcast task")
+                self.__broadcast_task.cancel()
             self.__broadcast_task = None
+
+    async def __initalize(self, session: WeatherLinkRest, entry: ConfigEntry) -> None:
+        self.session = session
+        entry.add_update_listener(self.__update_config)
+
+        self.update_method = self.__fetch_data
+        conditions = self.data = await self.__fetch_data()
+        if conditions is None:
+            raise RuntimeError(f"failed to get conditions from {session.base_url!r}")
+        self._device_type = conditions.determine_device_type()
+        self.device_did = conditions.did
+        self.device_model_name = self._device_type.value
+        self.device_name = conditions.determine_device_name()
+
+        await self.__update_config(self.hass, entry)
 
     async def __fetch_data(self) -> CurrentConditions:
         for i in range(MAX_FAIL_COUNTER):
@@ -97,8 +106,10 @@ class WeatherLinkCoordinator(DataUpdateCoordinator[CurrentConditions]):
         return conditions
 
     async def __broadcast_loop_once(self, broadcast: WeatherLinkBroadcast) -> None:
-        conditions = await broadcast.read()
         logger.debug("received broadcast conditions")
+        conditions = await broadcast.read()
+        self.data.update_from(conditions)
+        self.async_set_updated_data(self.data)
 
     async def __broadcast_loop(self) -> None:
         try:

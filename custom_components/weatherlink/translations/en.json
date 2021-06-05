@@ -25,7 +25,8 @@
         "title": "Misc",
         "description": "(1 / 3)",
         "data": {
-          "update_interval": "Update interval"
+          "update_interval": "Update interval",
+          "listen_to_broadcasts": "Listen to broadcasts"
         }
       },
       "units": {
