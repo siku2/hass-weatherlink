@@ -3,6 +3,7 @@ import logging
 from typing import Any, Dict
 
 import voluptuous as vol
+from aiohttp.client_exceptions import ServerDisconnectedError
 from homeassistant import config_entries
 from homeassistant.helpers import aiohttp_client
 from homeassistant.helpers import config_validation as cv
@@ -36,6 +37,11 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         session = WeatherLinkRest(session, host)
         try:
             conditions = await session.current_conditions()
+        except ServerDisconnectedError:
+            logger.warning(
+                f"server {host!r} disconnected during request, this device is probably already being polled"
+            )
+            raise FormError("host", "connect_failed")
         except Exception:
             logger.exception(f"failed to connect to {host!r}")
             raise FormError("host", "connect_failed")
