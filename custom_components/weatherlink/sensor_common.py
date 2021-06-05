@@ -3,7 +3,7 @@ import typing
 from typing import Iterable, Iterator, List, Optional, Type, Union
 
 from . import WeatherLinkCoordinator, WeatherLinkEntity
-from .api import ConditionRecord, CurrentConditions
+from .api.conditions import ConditionRecord, CurrentConditions
 from .units import Measurement
 
 logger = logging.getLogger(__name__)

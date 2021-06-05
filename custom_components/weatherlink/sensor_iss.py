@@ -1,7 +1,7 @@
 from typing import Optional
 
 from . import units
-from .api import IssCondition
+from .api.conditions import IssCondition
 from .const import DECIMALS_HUMIDITY, DECIMALS_RADIATION, DECIMALS_UV
 from .sensor_common import WeatherLinkSensor, round_optional
 

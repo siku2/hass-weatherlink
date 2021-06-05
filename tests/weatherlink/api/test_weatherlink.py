@@ -1,12 +1,12 @@
 import json
 
-from weatherlink.api import (
+from weatherlink.api.conditions import (
     CurrentConditions,
     IssCondition,
     LssBarCondition,
     LssTempHumCondition,
-    get_data_from_body,
 )
+from weatherlink.api.rest import parse_from_json
 
 
 def test_parse():
@@ -83,7 +83,7 @@ def test_parse():
         """
     )
 
-    data = CurrentConditions.from_json(get_data_from_body(payload), strict=True)
+    data = parse_from_json(CurrentConditions, payload, strict=True)
     assert data[IssCondition]
     assert data[LssTempHumCondition]
     assert data[LssBarCondition]
@@ -208,7 +208,7 @@ def test_parse_02():
         """
     )
 
-    data = CurrentConditions.from_json(get_data_from_body(payload), strict=True)
+    data = parse_from_json(CurrentConditions, payload, strict=True)
     assert data[IssCondition]
     assert data[LssTempHumCondition]
     assert data[LssBarCondition]

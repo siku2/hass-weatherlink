@@ -3,7 +3,7 @@ import logging
 from homeassistant.components.weather import WeatherEntity
 
 from . import WeatherLinkCoordinator, WeatherLinkEntity
-from .api import IssCondition, LssBarCondition
+from .api.conditions import IssCondition, LssBarCondition
 from .const import DOMAIN
 
 logger = logging.getLogger(__name__)

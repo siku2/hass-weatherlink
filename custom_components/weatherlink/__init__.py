@@ -9,7 +9,7 @@ from homeassistant.helpers.update_coordinator import (
     DataUpdateCoordinator,
 )
 
-from .api import CurrentConditions, WeatherLinkSession
+from .api import CurrentConditions, WeatherLinkRest
 from .const import DOMAIN, PLATFORMS
 from .units import UnitConfig, get_unit_config
 
@@ -39,7 +39,7 @@ MAX_FAIL_COUNTER = 3
 
 
 class WeatherLinkCoordinator(DataUpdateCoordinator[CurrentConditions]):
-    session: WeatherLinkSession
+    session: WeatherLinkRest
     units: UnitConfig
 
     device_did: str
@@ -52,9 +52,7 @@ class WeatherLinkCoordinator(DataUpdateCoordinator[CurrentConditions]):
         self.units = get_unit_config(hass, entry)
         self.update_interval = get_update_interval(entry)
 
-    async def __initalize(
-        self, session: WeatherLinkSession, entry: ConfigEntry
-    ) -> None:
+    async def __initalize(self, session: WeatherLinkRest, entry: ConfigEntry) -> None:
         self.session = session
         entry.add_update_listener(self.__update_config)
         await self.__update_config(self.hass, entry)
@@ -90,7 +88,7 @@ class WeatherLinkCoordinator(DataUpdateCoordinator[CurrentConditions]):
         return conditions
 
     @classmethod
-    async def build(cls, hass, session: WeatherLinkSession, entry: ConfigEntry):
+    async def build(cls, hass, session: WeatherLinkRest, entry: ConfigEntry):
         coordinator = cls(
             hass,
             logger,
@@ -107,7 +105,7 @@ async def setup_coordinator(hass, entry: ConfigEntry):
 
     coordinator = await WeatherLinkCoordinator.build(
         hass,
-        WeatherLinkSession(aiohttp_client.async_get_clientsession(hass), host),
+        WeatherLinkRest(aiohttp_client.async_get_clientsession(hass), host),
         entry,
     )
     hass.data[DOMAIN][entry.entry_id] = coordinator

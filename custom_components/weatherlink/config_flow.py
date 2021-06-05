@@ -7,7 +7,7 @@ from homeassistant import config_entries
 from homeassistant.helpers import aiohttp_client
 from homeassistant.helpers import config_validation as cv
 
-from .api import WeatherLinkSession
+from .api import WeatherLinkRest
 from .const import DOMAIN
 from .units import UnitConfig, get_unit_config
 
@@ -33,7 +33,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         logger.info("discovering: %s", host)
 
         session = aiohttp_client.async_get_clientsession(self.hass)
-        session = WeatherLinkSession(session, host)
+        session = WeatherLinkRest(session, host)
         try:
             conditions = await session.current_conditions()
         except Exception:

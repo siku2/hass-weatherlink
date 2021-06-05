@@ -3,7 +3,7 @@ import logging
 from homeassistant.components.air_quality import AirQualityEntity
 
 from . import WeatherLinkCoordinator, WeatherLinkEntity
-from .api import AirQualityCondition
+from .api.conditions import AirQualityCondition
 from .const import DOMAIN
 
 logger = logging.getLogger(__name__)

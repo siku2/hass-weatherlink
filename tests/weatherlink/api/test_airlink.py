@@ -1,6 +1,7 @@
 import json
 
-from weatherlink.api import AirQualityCondition, CurrentConditions, get_data_from_body
+from weatherlink.api.conditions import AirQualityCondition, CurrentConditions
+from weatherlink.api.rest import parse_from_json
 
 SAMPLE_RESPONSE = json.loads(
     """
@@ -47,5 +48,5 @@ SAMPLE_RESPONSE = json.loads(
 
 
 def test_parse():
-    data = CurrentConditions.from_json(get_data_from_body(SAMPLE_RESPONSE), strict=True)
+    data = parse_from_json(CurrentConditions, SAMPLE_RESPONSE, strict=True)
     assert data[AirQualityCondition]

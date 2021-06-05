@@ -1,7 +1,7 @@
 from typing import Optional
 
 from . import units
-from .api import CurrentConditions, MoistureCondition
+from .api.conditions import CurrentConditions, MoistureCondition
 from .const import DECIMALS_LEAF_WETNESS, DECIMALS_SOIL_MOISTURE
 from .sensor_common import WeatherLinkSensor, round_optional
 
