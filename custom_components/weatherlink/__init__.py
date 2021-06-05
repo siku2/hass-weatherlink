@@ -54,22 +54,27 @@ class WeatherLinkCoordinator(DataUpdateCoordinator[CurrentConditions]):
 
     __broadcast_task: Optional[asyncio.Task] = None
 
-    async def __update_config(self, hass: HomeAssistant, entry: ConfigEntry):
-        self.units = get_unit_config(hass, entry)
-        self.update_interval = get_update_interval(entry)
+    def __set_broadcast_task_state(self, on: bool) -> None:
+        if self.__broadcast_task:
+            logger.debug("stopping current broadcast task")
+            self.__broadcast_task.cancel()
 
-        if self._device_type.supports_real_time_api() and get_listen_to_broadcasts(
-            entry
-        ):
+        if on:
             logger.info("starting live broadcast listener")
             self.__broadcast_task = asyncio.create_task(
                 self.__broadcast_loop(), name="broadcast listener loop"
             )
         else:
-            if self.__broadcast_task:
-                logger.debug("stopping current broadcast task")
-                self.__broadcast_task.cancel()
             self.__broadcast_task = None
+
+    async def __update_config(self, hass: HomeAssistant, entry: ConfigEntry):
+        self.units = get_unit_config(hass, entry)
+        self.update_interval = get_update_interval(entry)
+
+        self.__set_broadcast_task_state(
+            self._device_type.supports_real_time_api()
+            and get_listen_to_broadcasts(entry)
+        )
 
     async def __initalize(self, session: WeatherLinkRest, entry: ConfigEntry) -> None:
         self.session = session
@@ -138,6 +143,9 @@ class WeatherLinkCoordinator(DataUpdateCoordinator[CurrentConditions]):
 
         return coordinator
 
+    async def destroy(self) -> None:
+        self.__set_broadcast_task_state(False)
+
 
 async def setup_coordinator(hass, entry: ConfigEntry):
     host = entry.data["host"]
@@ -165,7 +173,8 @@ async def async_unload_entry(hass, entry):
     for platform in PLATFORMS:
         await hass.config_entries.async_forward_entry_unload(entry, platform)
 
-    del hass.data[DOMAIN][entry.entry_id]
+    coordinator: WeatherLinkCoordinator = hass.data[DOMAIN].pop(entry.entry_id)
+    await coordinator.destroy()
 
     return True
 
