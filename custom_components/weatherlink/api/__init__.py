@@ -2,6 +2,7 @@ import abc
 import dataclasses
 import enum
 import logging
+import time
 from datetime import datetime
 from typing import Any, Callable, Dict, Iterable, List, Mapping, Optional, Type, TypeVar
 
@@ -498,6 +499,16 @@ class CurrentConditions(FromJson, Mapping[Type[RecordT], RecordT]):
 
 
 @dataclasses.dataclass()
+class RealTimeBroadcastResponse(FromJson):
+    broadcast_port: int
+    duration: float
+
+    @classmethod
+    def _from_json(cls, data: JsonObject, **kwargs):
+        return cls(**data)
+
+
+@dataclasses.dataclass()
 class ApiError(Exception, FromJson):
     code: int
     message: str
@@ -517,24 +528,57 @@ def get_data_from_body(body: JsonObject) -> JsonObject:
     return body["data"]
 
 
+RT_BROADCAST_DURATION = 60 * 60
+
+
 class WeatherLinkSession:
     EP_CURRENT_CONDITIONS = "/v1/current_conditions"
+    EP_REAL_TIME = "/v1/real_time"
 
     session: aiohttp.ClientSession
     base_url: str
+
+    _rt_broadcast_port: Optional[int] = None
+    _rt_next_renew: float = 0.0
 
     def __init__(self, session: aiohttp.ClientSession, base_url: str) -> None:
         self.session = session
         self.base_url = base_url
 
-    async def _request(self, path: str) -> JsonObject:
-        async with self.session.get(self.base_url + path) as resp:
+    async def _request(
+        self, path: str, /, *, params: Mapping[str, str] = None
+    ) -> JsonObject:
+        async with self.session.get(self.base_url + path, params=params) as resp:
             body = await resp.json()
             return get_data_from_body(body)
 
     async def current_conditions(self) -> CurrentConditions:
         raw_data = await self._request(self.EP_CURRENT_CONDITIONS)
         return CurrentConditions.from_json(raw_data)
+
+    async def _request_rt_broadcast(self, duration: int) -> RealTimeBroadcastResponse:
+        data = await self._request(
+            self.EP_REAL_TIME,
+            params={"duration": duration},
+        )
+        return RealTimeBroadcastResponse.from_json(data)
+
+    async def __renew_rt_broadcast(self) -> bool:
+        if time.time() < self._rt_next_renew:
+            return False
+
+        logger.debug("renewing real-time broadcast")
+        rt = await self._request_rt_broadcast(RT_BROADCAST_DURATION)
+        logger.info("renewed real-time broadcast: %s", rt)
+        self._rt_broadcast_port = rt.broadcast_port
+        self._rt_next_renew = time.time() + (rt.duration / 2.0)
+        return True
+
+    async def _rt_loop(self) -> None:
+        await self.__renew_rt_broadcast()
+
+        while True:
+            await self.__renew_rt_broadcast()
 
 
 def fahrenheit_to_celsius(value: float) -> float:
