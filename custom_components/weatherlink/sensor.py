@@ -1,5 +1,5 @@
 from . import WeatherLinkCoordinator, units
-from .api import LssBarCondition, LssTempHumCondition
+from .api.conditions import LssBarCondition, LssTempHumCondition
 from .const import DECIMALS_HUMIDITY, DOMAIN
 from .sensor_air_quality import *
 from .sensor_common import WeatherLinkSensor, round_optional

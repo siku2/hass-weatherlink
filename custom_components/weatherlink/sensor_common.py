@@ -3,7 +3,7 @@ import typing
 from typing import Iterable, Iterator, List, Optional, Type, Union
 
 from . import WeatherLinkCoordinator, WeatherLinkEntity
-from .api import ConditionRecord, CurrentConditions
+from .api.conditions import ConditionRecord, CurrentConditions
 from .units import Measurement
 
 logger = logging.getLogger(__name__)
@@ -74,8 +74,11 @@ class WeatherLinkSensor(WeatherLinkEntity):
         cls, coord: WeatherLinkCoordinator
     ) -> Iterator["WeatherLinkSensor"]:
         for cls in cls._SENSORS:
-            if not cls._conditions_ok(coord.current_conditions):
-                logger.info("ignoring sensor %s because requirements are not met", cls)
+            if not cls._conditions_ok(coord.data):
+                logger.debug(
+                    "ignoring sensor %s because requirements are not met",
+                    cls.__qualname__,
+                )
                 continue
             yield cls(coord)
 

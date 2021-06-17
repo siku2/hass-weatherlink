@@ -3,7 +3,7 @@ import logging
 from homeassistant.components.air_quality import AirQualityEntity
 
 from . import WeatherLinkCoordinator, WeatherLinkEntity
-from .api import AirQualityCondition
+from .api.conditions import AirQualityCondition
 from .const import DOMAIN
 
 logger = logging.getLogger(__name__)
@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 async def async_setup_entry(hass, entry, async_add_entities):
     c: WeatherLinkCoordinator = hass.data[DOMAIN][entry.entry_id]
-    if AirQualityCondition in c.current_conditions:
+    if AirQualityCondition in c.data:
         async_add_entities([AirQuality(c)])
 
     return True

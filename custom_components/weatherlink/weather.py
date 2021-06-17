@@ -3,7 +3,7 @@ import logging
 from homeassistant.components.weather import WeatherEntity
 
 from . import WeatherLinkCoordinator, WeatherLinkEntity
-from .api import IssCondition, LssBarCondition
+from .api.conditions import IssCondition, LssBarCondition
 from .const import DOMAIN
 
 logger = logging.getLogger(__name__)
@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 async def async_setup_entry(hass, entry, async_add_entities):
     c: WeatherLinkCoordinator = hass.data[DOMAIN][entry.entry_id]
-    if IssCondition in c.current_conditions:
+    if IssCondition in c.data:
         async_add_entities([Weather(c)])
 
     return True

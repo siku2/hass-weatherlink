@@ -3,17 +3,24 @@ import logging
 from typing import Any, Dict
 
 import voluptuous as vol
+from aiohttp.client_exceptions import ServerDisconnectedError
 from homeassistant import config_entries
 from homeassistant.helpers import aiohttp_client
 from homeassistant.helpers import config_validation as cv
 
-from .api import WeatherLinkSession
+from .api import WeatherLinkRest
 from .const import DOMAIN
 from .units import UnitConfig, get_unit_config
 
 logger = logging.getLogger(__name__)
 
 FORM_SCHEMA = vol.Schema({vol.Required("host"): str})
+
+KEY_LISTEN_TO_BROADCASTS = "listen_to_broadcasts"
+
+
+def get_listen_to_broadcasts(config_entry: config_entries.ConfigEntry) -> bool:
+    return config_entry.options.get(KEY_LISTEN_TO_BROADCASTS, True)
 
 
 @dataclasses.dataclass()
@@ -33,9 +40,14 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         logger.info("discovering: %s", host)
 
         session = aiohttp_client.async_get_clientsession(self.hass)
-        session = WeatherLinkSession(session, host)
+        session = WeatherLinkRest(session, host)
         try:
             conditions = await session.current_conditions()
+        except ServerDisconnectedError:
+            logger.warning(
+                f"server {host!r} disconnected during request, this device is probably already being polled"
+            )
+            raise FormError("host", "connect_failed")
         except Exception:
             logger.exception(f"failed to connect to {host!r}")
             raise FormError("host", "connect_failed")
@@ -104,6 +116,9 @@ class OptionsFlow(config_entries.OptionsFlow):
 
         errors = {}
         if user_input is not None:
+            self.options[KEY_LISTEN_TO_BROADCASTS] = user_input[
+                KEY_LISTEN_TO_BROADCASTS
+            ]
             try:
                 self.options["update_interval"] = cv.time_period_str(
                     user_input["update_interval"]
@@ -120,7 +135,11 @@ class OptionsFlow(config_entries.OptionsFlow):
                     vol.Required(
                         "update_interval",
                         default=str(get_update_interval(self.config_entry)),
-                    ): str
+                    ): str,
+                    vol.Required(
+                        KEY_LISTEN_TO_BROADCASTS,
+                        default=get_listen_to_broadcasts(self.config_entry),
+                    ): bool,
                 }
             ),
             errors=errors,

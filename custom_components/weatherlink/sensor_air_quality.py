@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from . import units
-from .api import AirQualityCondition
+from .api.conditions import AirQualityCondition
 from .const import DECIMALS_HUMIDITY
 from .sensor_common import WeatherLinkSensor
 

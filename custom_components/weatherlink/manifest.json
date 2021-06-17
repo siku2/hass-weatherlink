@@ -2,7 +2,7 @@
   "domain": "weatherlink",
   "name": "WeatherLink",
   "version": "0.2.1",
-  "documentation": "https://github.com/siku2/hass-weatherlink",
+  "documentation": "https://github.com/siku2/hass-weatherlink/wiki",
   "issue_tracker": "https://github.com/siku2/hass-weatherlink/issues",
   "codeowners": [
     "@siku2"

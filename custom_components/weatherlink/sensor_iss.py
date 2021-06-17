@@ -1,7 +1,7 @@
 from typing import Optional
 
 from . import units
-from .api import IssCondition
+from .api.conditions import IssCondition
 from .const import DECIMALS_HUMIDITY, DECIMALS_RADIATION, DECIMALS_UV
 from .sensor_common import WeatherLinkSensor, round_optional
 
@@ -135,6 +135,23 @@ class WindSpeed(
         }
 
 
+class WindSpeedNow(
+    IssSensor,
+    sensor_name="Wind speed last",
+    unit_of_measurement=units.WindSpeed,
+    device_class=None,
+):
+    @property
+    def icon(self):
+        return "mdi:weather-windy"
+
+    @property
+    def state(self):
+        return self.units.wind_speed.convert_optional(
+            self._iss_condition.wind_speed_last
+        )
+
+
 class WindMaxSpeed(
     IssSensor,
     sensor_name="Wind max speed",
@@ -182,6 +199,21 @@ class WindBearing(
             "10_min": c.wind_dir_scalar_avg_last_10_min,
             "10_min_high": c.wind_dir_at_hi_speed_last_10_min,
         }
+
+
+class WindBearingNow(
+    IssSensor,
+    sensor_name="Wind bearing last",
+    unit_of_measurement="°",
+    device_class=None,
+):
+    @property
+    def icon(self):
+        return "mdi:compass-rose"
+
+    @property
+    def state(self):
+        return self._iss_condition.wind_dir_last
 
 
 class WindDirection(
@@ -284,7 +316,7 @@ class RainRate(
         u = self.units.rain_rate
         return {
             "high": u.convert_optional(c.rain_rate_hi),
-            "15_min_high": u.convert(c.rain_rate_hi_last_15_min),
+            "15_min_high": u.convert_optional(c.rain_rate_hi_last_15_min),
         }
 
 
