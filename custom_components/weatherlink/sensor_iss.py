@@ -135,6 +135,23 @@ class WindSpeed(
         }
 
 
+class WindSpeedNow(
+    IssSensor,
+    sensor_name="Wind speed last",
+    unit_of_measurement=units.WindSpeed,
+    device_class=None,
+):
+    @property
+    def icon(self):
+        return "mdi:weather-windy"
+
+    @property
+    def state(self):
+        return self.units.wind_speed.convert_optional(
+            self._iss_condition.wind_speed_last
+        )
+
+
 class WindMaxSpeed(
     IssSensor,
     sensor_name="Wind max speed",
@@ -182,6 +199,21 @@ class WindBearing(
             "10_min": c.wind_dir_scalar_avg_last_10_min,
             "10_min_high": c.wind_dir_at_hi_speed_last_10_min,
         }
+
+
+class WindBearingNow(
+    IssSensor,
+    sensor_name="Wind bearing last",
+    unit_of_measurement="°",
+    device_class=None,
+):
+    @property
+    def icon(self):
+        return "mdi:compass-rose"
+
+    @property
+    def state(self):
+        return self._iss_condition.wind_dir_last
 
 
 class WindDirection(
