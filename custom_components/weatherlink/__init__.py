@@ -114,7 +114,11 @@ class WeatherLinkCoordinator(DataUpdateCoordinator[CurrentConditions]):
         logger.debug("received broadcast conditions")
         conditions = await broadcast.read()
         self.data.update_from(conditions)
-        self.async_set_updated_data(self.data)
+
+        # TODO theoretically this only needs to update sensors which actually make use of the live data
+        # notify all listeners without resetting the polling interval
+        for update_callback in self._listeners:
+            update_callback()
 
     async def __broadcast_loop(self) -> None:
         try:
