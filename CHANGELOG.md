@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.5.1] - 2021-06-18
 
+### Added
+
+- This changelog
+
 ### Fixed
 
 - Polling-based sensors no longer working if real-time broadcast listening is enabled
