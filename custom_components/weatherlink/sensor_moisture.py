@@ -45,7 +45,7 @@ class MoistureStatus(
         return rx_state.name
 
     @property
-    def device_state_attributes(self):
+    def extra_state_attributes(self):
         c = self._moisture_condition
         return {
             "txid": c.txid,
@@ -168,7 +168,7 @@ class LeafABC(MoistureSensor, abc=True):
         return None
 
     @property
-    def device_state_attributes(self):
+    def extra_state_attributes(self):
         return {
             "raw": round_optional(self._wet_leaf(self._moisture_condition), 1),
         }

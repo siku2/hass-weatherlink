@@ -57,7 +57,7 @@ class AirQualityStatus(
         return "connected"
 
     @property
-    def device_state_attributes(self):
+    def extra_state_attributes(self):
         c = self._aq_condition
         return {
             "last_report_time": c.last_report_time,
@@ -79,7 +79,7 @@ class Temperature(
         return self.units.temperature.convert(self._aq_condition.temp)
 
     @property
-    def device_state_attributes(self):
+    def extra_state_attributes(self):
         c = self._aq_condition
         u = self.units.temperature
         return {
@@ -130,7 +130,7 @@ class Pm2p5(
         return self.units.pm.convert(self._aq_condition.pm_2p5_nowcast)
 
     @property
-    def device_state_attributes(self):
+    def extra_state_attributes(self):
         c = self._aq_condition
         u = self.units.pm
         return {
@@ -156,7 +156,7 @@ class Pm10p0(
         return self.units.pm.convert(self._aq_condition.pm_10_nowcast)
 
     @property
-    def device_state_attributes(self):
+    def extra_state_attributes(self):
         c = self._aq_condition
         u = self.units.pm
         return {

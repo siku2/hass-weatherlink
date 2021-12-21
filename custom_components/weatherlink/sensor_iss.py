@@ -56,7 +56,7 @@ class IssStatus(
         return rx_state.name
 
     @property
-    def device_state_attributes(self):
+    def extra_state_attributes(self):
         c = self._iss_condition
         return {
             "txid": c.txid,
@@ -75,7 +75,7 @@ class Temperature(
         return self.units.temperature.convert_optional(self._iss_condition.temp)
 
     @property
-    def device_state_attributes(self):
+    def extra_state_attributes(self):
         c = self._iss_condition
         u = self.units.temperature
         return {
@@ -127,7 +127,7 @@ class WindSpeed(
         )
 
     @property
-    def device_state_attributes(self):
+    def extra_state_attributes(self):
         c = self._iss_condition
         u = self.units.wind_speed
         return {
@@ -169,7 +169,7 @@ class WindMaxSpeed(
         )
 
     @property
-    def device_state_attributes(self):
+    def extra_state_attributes(self):
         c = self._iss_condition
         u = self.units.wind_speed
         return {
@@ -192,7 +192,7 @@ class WindBearing(
         return self._iss_condition.wind_dir_scalar_avg_last_2_min
 
     @property
-    def device_state_attributes(self):
+    def extra_state_attributes(self):
         c = self._iss_condition
         return {
             "high": c.wind_dir_at_hi_speed_last_2_min,
@@ -251,7 +251,7 @@ class WindDirection(
         return self.bearing_to_dir(self._iss_condition.wind_dir_scalar_avg_last_2_min)
 
     @property
-    def device_state_attributes(self):
+    def extra_state_attributes(self):
         c = self._iss_condition
         return {
             "high": self.bearing_to_dir(c.wind_dir_at_hi_speed_last_2_min),
@@ -311,7 +311,7 @@ class RainRate(
         return self.units.rain_rate.convert(self._iss_condition.rain_rate_last)
 
     @property
-    def device_state_attributes(self):
+    def extra_state_attributes(self):
         c = self._iss_condition
         u = self.units.rain_rate
         return {
@@ -335,7 +335,7 @@ class Rainfall(
         return self.units.rainfall.convert(self._iss_condition.rainfall_daily)
 
     @property
-    def device_state_attributes(self):
+    def extra_state_attributes(self):
         c = self._iss_condition
         u = self.units.rainfall
         return {
@@ -362,7 +362,7 @@ class Rainstorm(
         return self.units.rainfall.convert_optional(self._iss_condition.rain_storm)
 
     @property
-    def device_state_attributes(self):
+    def extra_state_attributes(self):
         c = self._iss_condition
         u = self.units.rainfall
         return {
