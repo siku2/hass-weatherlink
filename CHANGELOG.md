@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Forgot to update the version in manifest.json all this time
+- Use extra_state_attributes instead of device_state_attributes
+- Use atribute notation instead of key notation for discovery_info
 
 ## [0.5.1] - 2021-06-18
 
