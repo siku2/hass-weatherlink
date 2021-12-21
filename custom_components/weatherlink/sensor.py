@@ -29,7 +29,7 @@ class Pressure(
         return self.units.pressure.convert(self._lss_bar_condition.bar_sea_level)
 
     @property
-    def device_state_attributes(self):
+    def extra_state_attributes(self):
         condition = self._lss_bar_condition
         u = self.units.pressure
         return {
@@ -54,7 +54,7 @@ class InsideTemp(
         return self.units.temperature.convert(self._lss_temp_hum_condition.temp_in)
 
     @property
-    def device_state_attributes(self):
+    def extra_state_attributes(self):
         condition = self._lss_temp_hum_condition
         u = self.units.temperature
         return {

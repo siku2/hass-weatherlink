@@ -77,8 +77,8 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     async def async_step_zeroconf(
         self, discovery_info: Dict[str, Any]
     ) -> Dict[str, Any]:
-        host: str = discovery_info["host"]
-        port: int = discovery_info["port"]
+        host: str = discovery_info.host
+        port: int = discovery_info.port
         try:
             self.discovery_data = await self.discover(f"http://{host}:{port}")
             return await self.async_step_zeroconf_confirm()
