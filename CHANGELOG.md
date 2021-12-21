@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.2] - 2021-12-21
+
 ### Fixed
 
 - Forgot to update the version in manifest.json all this time
@@ -142,18 +144,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.2.2] - 2021-05-11
 
-[Unreleased]: https://github.com/siku2/hass-weatherlink/compare/v0.5.0...HEAD
-[0.5.1]: https://github.com/siku2/hass-weatherlink/compare/v0.5.0...v0.5.1
-[0.5.0]: https://github.com/siku2/hass-weatherlink/compare/v0.4.1...v0.5.0
-[0.4.1]: https://github.com/siku2/hass-weatherlink/compare/v0.4.0...v0.4.1
-[0.4.0]: https://github.com/siku2/hass-weatherlink/compare/v0.3.0...v0.4.0
-[0.3.0]: https://github.com/siku2/hass-weatherlink/compare/v0.2.7...v0.3.0
-[0.2.7]: https://github.com/siku2/hass-weatherlink/compare/v0.2.6...v0.2.7
-[0.2.6]: https://github.com/siku2/hass-weatherlink/compare/v0.2.5...v0.2.6
-[0.2.5]: https://github.com/siku2/hass-weatherlink/compare/v0.2.4...v0.2.5
-[0.2.4]: https://github.com/siku2/hass-weatherlink/compare/v0.2.3...v0.2.4
-[0.2.3]: https://github.com/siku2/hass-weatherlink/compare/v0.2.2...v0.2.3
-[0.2.2]: https://github.com/siku2/hass-weatherlink/releases/tag/v0.2.2
+[Unreleased]: https://github.com/siku2/hass-weatherlink/compare/v0.5.2...HEAD
+[0.5.2]:      https://github.com/siku2/hass-weatherlink/compare/v0.5.1...v0.5.2
+[0.5.1]:      https://github.com/siku2/hass-weatherlink/compare/v0.5.0...v0.5.1
+[0.5.0]:      https://github.com/siku2/hass-weatherlink/compare/v0.4.1...v0.5.0
+[0.4.1]:      https://github.com/siku2/hass-weatherlink/compare/v0.4.0...v0.4.1
+[0.4.0]:      https://github.com/siku2/hass-weatherlink/compare/v0.3.0...v0.4.0
+[0.3.0]:      https://github.com/siku2/hass-weatherlink/compare/v0.2.7...v0.3.0
+[0.2.7]:      https://github.com/siku2/hass-weatherlink/compare/v0.2.6...v0.2.7
+[0.2.6]:      https://github.com/siku2/hass-weatherlink/compare/v0.2.5...v0.2.6
+[0.2.5]:      https://github.com/siku2/hass-weatherlink/compare/v0.2.4...v0.2.5
+[0.2.4]:      https://github.com/siku2/hass-weatherlink/compare/v0.2.3...v0.2.4
+[0.2.3]:      https://github.com/siku2/hass-weatherlink/compare/v0.2.2...v0.2.3
+[0.2.2]:      https://github.com/siku2/hass-weatherlink/releases/tag/v0.2.2
 
 [#2]:    https://github.com/siku2/hass-weatherlink/issues/2
 [#7]:    https://github.com/siku2/hass-weatherlink/issues/7
