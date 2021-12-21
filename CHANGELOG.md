@@ -12,8 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Forgot to update the version in manifest.json all this time
-- Use extra_state_attributes instead of device_state_attributes
-- Use atribute notation instead of key notation for discovery_info
+- Use extra_state_attributes instead of device_state_attributes ([#17])
+- Use attribute notation instead of key notation for discovery_info ([#17])
 
 ## [0.5.1] - 2021-06-18
 
@@ -158,6 +158,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.2.3]:      https://github.com/siku2/hass-weatherlink/compare/v0.2.2...v0.2.3
 [0.2.2]:      https://github.com/siku2/hass-weatherlink/releases/tag/v0.2.2
 
-[#2]:    https://github.com/siku2/hass-weatherlink/issues/2
-[#7]:    https://github.com/siku2/hass-weatherlink/issues/7
+[#17]:   https://github.com/siku2/hass-weatherlink/issues/17
 [#8]:    https://github.com/siku2/hass-weatherlink/issues/8
+[#7]:    https://github.com/siku2/hass-weatherlink/issues/7
+[#2]:    https://github.com/siku2/hass-weatherlink/issues/2
