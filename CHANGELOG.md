@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Problems with broadcast reception ([#23])
+
 ## [0.5.2] - 2021-12-21
 
 ### Fixed
@@ -158,7 +162,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.2.3]:      https://github.com/siku2/hass-weatherlink/compare/v0.2.2...v0.2.3
 [0.2.2]:      https://github.com/siku2/hass-weatherlink/releases/tag/v0.2.2
 
-[#17]:   https://github.com/siku2/hass-weatherlink/issues/17
-[#8]:    https://github.com/siku2/hass-weatherlink/issues/8
-[#7]:    https://github.com/siku2/hass-weatherlink/issues/7
-[#2]:    https://github.com/siku2/hass-weatherlink/issues/2
+[#23]: https://github.com/siku2/hass-weatherlink/issues/23
+[#17]: https://github.com/siku2/hass-weatherlink/issues/17
+[#8]:  https://github.com/siku2/hass-weatherlink/issues/8
+[#7]:  https://github.com/siku2/hass-weatherlink/issues/7
+[#2]:  https://github.com/siku2/hass-weatherlink/issues/2

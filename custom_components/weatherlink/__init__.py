@@ -96,7 +96,8 @@ class WeatherLinkCoordinator(DataUpdateCoordinator[CurrentConditions]):
             try:
                 conditions = await self.session.current_conditions()
             except Exception as exc:
-                logger.warning(
+                log_fun = logger.warning if i > 0 else logger.debug
+                log_fun(
                     "failed to get current conditions, error %s / %s",
                     i + 1,
                     MAX_FAIL_COUNTER,
@@ -117,8 +118,7 @@ class WeatherLinkCoordinator(DataUpdateCoordinator[CurrentConditions]):
 
         # TODO theoretically this only needs to update sensors which actually make use of the live data
         # notify all listeners without resetting the polling interval
-        for update_callback in self._listeners:
-            update_callback()
+        self.async_update_listeners()
 
     async def __broadcast_loop(self) -> None:
         try:
