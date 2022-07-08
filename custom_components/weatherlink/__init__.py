@@ -92,21 +92,20 @@ class WeatherLinkCoordinator(DataUpdateCoordinator[CurrentConditions]):
         await self.__update_config(self.hass, entry)
 
     async def __fetch_data(self) -> CurrentConditions:
-        for i in range(MAX_FAIL_COUNTER):
+        exc_info = None
+        for _ in range(MAX_FAIL_COUNTER):
             try:
                 conditions = await self.session.current_conditions()
             except Exception as exc:
-                log_fun = logger.warning if i > 0 else logger.debug
-                log_fun(
-                    "failed to get current conditions, error %s / %s",
-                    i + 1,
-                    MAX_FAIL_COUNTER,
-                    exc_info=exc,
-                )
+                exc_info = exc
                 await asyncio.sleep(FAIL_TIMEOUT)
             else:
                 break
         else:
+            logger.warning(
+                f"failed to get current conditions in {MAX_FAIL_COUNTER} attempt(s)",
+                exc_info=exc_info,
+            )
             conditions = self.data
 
         return conditions

@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.3] - 2022-07-08
+
+### Changed
+
+- Adjusted log levels to reduce clutter when polling fails ([#19])
+
 ### Fixed
 
 - Problems with broadcast reception ([#23])
@@ -148,7 +154,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.2.2] - 2021-05-11
 
-[Unreleased]: https://github.com/siku2/hass-weatherlink/compare/v0.5.2...HEAD
+[Unreleased]: https://github.com/siku2/hass-weatherlink/compare/v0.5.3...HEAD
+[0.5.3]:      https://github.com/siku2/hass-weatherlink/compare/v0.5.2...v0.5.3
 [0.5.2]:      https://github.com/siku2/hass-weatherlink/compare/v0.5.1...v0.5.2
 [0.5.1]:      https://github.com/siku2/hass-weatherlink/compare/v0.5.0...v0.5.1
 [0.5.0]:      https://github.com/siku2/hass-weatherlink/compare/v0.4.1...v0.5.0
@@ -163,6 +170,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.2.2]:      https://github.com/siku2/hass-weatherlink/releases/tag/v0.2.2
 
 [#23]: https://github.com/siku2/hass-weatherlink/issues/23
+[#19]: https://github.com/siku2/hass-weatherlink/issues/19
 [#17]: https://github.com/siku2/hass-weatherlink/issues/17
 [#8]:  https://github.com/siku2/hass-weatherlink/issues/8
 [#7]:  https://github.com/siku2/hass-weatherlink/issues/7
