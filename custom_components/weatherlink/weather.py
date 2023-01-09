@@ -1,5 +1,10 @@
 import logging
 
+from homeassistant.const import (
+    UnitOfPressure,
+    UnitOfSpeed,
+    UnitOfTemperature,
+)
 from homeassistant.components.weather import WeatherEntity
 
 from . import WeatherLinkCoordinator, WeatherLinkEntity
@@ -27,20 +32,24 @@ class Weather(WeatherEntity, WeatherLinkEntity):
         return self.coordinator.device_name
 
     @property
-    def temperature(self):
+    def native_temperature(self):
         # rounded by `WeatherEntity`
-        return self.units.temperature.convert_optional(self._iss_condition.temp)
+        return self._iss_condition.temp
 
     @property
-    def temperature_unit(self):
-        return self.units.temperature.info.unit_of_measurement
+    def native_temperature_unit(self):
+        return UnitOfTemperature.CELSIUS
 
     @property
-    def pressure(self):
+    def native_pressure(self):
         if condition := self._conditions.get(LssBarCondition):
-            return self.units.pressure.convert(condition.bar_sea_level)
+            return condition.bar_sea_level
 
         return None
+
+    @property
+    def native_pressure_unit(self):
+        return UnitOfPressure.HPA
 
     @property
     def humidity(self):
@@ -48,10 +57,12 @@ class Weather(WeatherEntity, WeatherLinkEntity):
         return self._iss_condition.hum
 
     @property
-    def wind_speed(self):
-        return self.units.wind_speed.convert_optional(
-            self._iss_condition.wind_speed_avg_last_2_min
-        )
+    def native_wind_speed(self):
+        return self._iss_condition.wind_speed_avg_last_2_min
+
+    @property
+    def native_wind_speed_unit(self):
+        return UnitOfSpeed.KILOMETERS_PER_HOUR
 
     @property
     def wind_bearing(self):

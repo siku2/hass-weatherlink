@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Changed Weather entity to native units ([#25])
+
 ## [0.5.3] - 2022-07-08
 
 ### Changed
