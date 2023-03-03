@@ -210,7 +210,7 @@ def get_unit_config(hass: HomeAssistant, entry: ConfigEntry) -> UnitConfig:
     except Exception:
         logger.exception(f"failed to load unit config: {entry.options!r}")
 
-    if hass.config.units.name == CONF_UNIT_SYSTEM_IMPERIAL:
+    if hass.config.units is IMPERIAL_SYSTEM:
         return UnitConfig.default_imperial()
 
     return UnitConfig.default_metric()
