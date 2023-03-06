@@ -4,7 +4,7 @@ from typing import Mapping, Optional, Type, Union
 
 import voluptuous as vol
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import CONF_UNIT_SYSTEM_IMPERIAL
+from homeassistant.const import IMPERIAL_SYSTEM
 from homeassistant.core import HomeAssistant
 
 from .units_db import (
