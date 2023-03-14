@@ -4,7 +4,7 @@ from typing import Mapping, Optional, Type, Union
 
 import voluptuous as vol
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import CONF_UNIT_SYSTEM_IMPERIAL
+from homeassistant.util.unit_system import US_CUSTOMARY_SYSTEM
 from homeassistant.core import HomeAssistant
 
 from .units_db import (
@@ -210,7 +210,7 @@ def get_unit_config(hass: HomeAssistant, entry: ConfigEntry) -> UnitConfig:
     except Exception:
         logger.exception(f"failed to load unit config: {entry.options!r}")
 
-    if hass.config.units.name == CONF_UNIT_SYSTEM_IMPERIAL:
+    if hass.config.units == US_CUSTOMARY_SYSTEM:
         return UnitConfig.default_imperial()
 
     return UnitConfig.default_metric()
