@@ -1,15 +1,19 @@
 # Home Assistant WeatherLink
 
-[![HACS](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
-![Python 3.8](https://img.shields.io/badge/python-3.8-blue)
+[![GitHub Release](https://img.shields.io/github/release/siku2/hass-weatherlink.svg?style=for-the-badge)](https://github.com/siku2/hass-weatherlink/releases)
+[![GitHub Activity](https://img.shields.io/github/commit-activity/y/siku2/hass-weatherlink.svg?style=for-the-badge)](https://github.com/siku2/hass-weatherlink/commits/main)
+[![License](https://img.shields.io/github/license/siku2/hass-weatherlink.svg?style=for-the-badge)](LICENSE)
 
-A custom component for Davis Instruments' [WeatherLink](https://www.davisinstruments.com/weatherlinklive/) and [AirLink](https://www.davisinstruments.com/airlink/) stations.
+[![hacs](https://img.shields.io/badge/HACS-Custom-orange.svg?style=for-the-badge)](https://hacs.xyz/docs/faq/custom_repositories)
+
+_Bringing support for Davis Instruments' [WeatherLink](https://www.davisinstruments.com/weatherlinklive) and [AirLink](https://www.davisinstruments.com/airlink) stations to Home Assistant._
 
 ## Installation
 
-1. Add this repository as a [Custom repository](https://hacs.xyz/docs/faq/custom_repositories/) to HACS
-2. Install the "WeatherLink" integration in HACS
-3. Head over to the Home Assistant configuration and set up the integration there
+1. Add this repository as a custom repository to HACS: [![Add Repository](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=siku2&repository=hass-weatherlink&category=integration)
+2. Use HACS to install the integration.
+3. Restart Home Assistant.
+4. Set up the integration using the UI: [![Add Integration](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=weatherlink)
 
 ## Limitations
 
@@ -25,7 +29,6 @@ If you're running into a problem that's caused by this behaviour, please open an
 Older versions of the AirLink firmware use a different data structure format when transmitting updates.
 This integration currently doesn't support this so in case AirLink isn't working, try updating the firmware.
 
-#### AQI
+## Contributions are welcome!
 
-The calculation of AQI varies from country to country and may require inputs that are not available to a single sensor.
-For AQI calculations using the latest AQI models.
+If you want to contribute to this please read the [Contribution guidelines](CONTRIBUTING.md)
