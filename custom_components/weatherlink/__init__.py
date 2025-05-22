@@ -164,10 +164,7 @@ async def setup_coordinator(hass, entry: ConfigEntry):
 async def async_setup_entry(hass, entry):
     await setup_coordinator(hass, entry)
 
-    for platform in PLATFORMS:
-        hass.async_create_task(
-            hass.config_entries.async_forward_entry_setup(entry, platform)
-        )
+    await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
     return True
 
