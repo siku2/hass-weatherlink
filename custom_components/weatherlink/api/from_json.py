@@ -21,8 +21,7 @@ class FromJson(abc.ABC):
 
     @classmethod
     @abc.abstractmethod
-    def _from_json(cls, data: JsonObject, **kwargs):
-        ...
+    def _from_json(cls, data: JsonObject, **kwargs): ...
 
     @classmethod
     def from_json(cls: Type[FromJsonT], data: JsonObject, **kwargs) -> FromJsonT:

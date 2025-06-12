@@ -21,8 +21,7 @@ class WeatherLinkSensor(WeatherLinkEntity):
         device_class: Optional[str],
         required_conditions: Iterable[Type[ConditionRecord]] = None,
         **kwargs,
-    ) -> None:
-        ...
+    ) -> None: ...
 
     @typing.overload
     def __init_subclass__(
@@ -30,8 +29,7 @@ class WeatherLinkSensor(WeatherLinkEntity):
         *,
         abc: bool,
         **kwargs,
-    ) -> None:
-        ...
+    ) -> None: ...
 
     def __init_subclass__(
         cls,
