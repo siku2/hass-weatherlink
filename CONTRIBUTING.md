@@ -15,7 +15,7 @@ Pull requests are the best way to propose changes to the codebase.
 
 1. Fork the repo and create your branch from `main`.
 2. If you've changed something, update the documentation.
-3. Make sure your code lints (using `scripts/lint`).
+3. Make sure your code lints (using `scripts/lint.sh`).
 4. Test you contribution.
 5. Issue that pull request!
 
@@ -45,6 +45,7 @@ People *love* thorough bug reports. I'm not even kidding.
 ## Use a Consistent Coding Style
 
 Use [black](https://github.com/ambv/black) to make sure the code follows the style.
+Sort your imports using [isort](https://pycqa.github.io/isort/).
 
 ## Test your code modification
 
@@ -59,3 +60,13 @@ file.
 ## License
 
 By contributing, you agree that your contributions will be licensed under its MIT License.
+
+## Pull updates from the template repository
+
+```shell
+# add the template repo as a remote
+git remote add template https://github.com/siku2/hass-integration-template.git
+git remote update
+# merge changes
+git merge --squash -e -Xtheirs --allow-unrelated-histories template/main
+```
