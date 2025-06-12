@@ -1,11 +1,11 @@
 import logging
 
+from homeassistant.components.weather import WeatherEntity
 from homeassistant.const import (
     UnitOfPressure,
     UnitOfSpeed,
     UnitOfTemperature,
 )
-from homeassistant.components.weather import WeatherEntity
 
 from . import WeatherLinkCoordinator, WeatherLinkEntity
 from .api.conditions import IssCondition, LssBarCondition

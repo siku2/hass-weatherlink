@@ -1,11 +1,11 @@
 import dataclasses
 import logging
-from typing import Mapping, Optional, Type, Union
+from collections.abc import Mapping
 
 import voluptuous as vol
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.util.unit_system import US_CUSTOMARY_SYSTEM
 from homeassistant.core import HomeAssistant
+from homeassistant.util.unit_system import US_CUSTOMARY_SYSTEM
 
 from .units_db import (
     Measurement,
@@ -20,13 +20,13 @@ from .units_db import (
 
 logger = logging.getLogger(__name__)
 
-IntOrFloat = Union[float, int]
+type IntOrFloat = float | int
 
 
 @dataclasses.dataclass()
 class Unit:
     info: UnitInfo
-    ndigits: Optional[int]
+    ndigits: int | None
 
     def __round(self, v: float) -> IntOrFloat:
         if self.ndigits is None:
@@ -37,7 +37,7 @@ class Unit:
     def convert(self, v: float) -> IntOrFloat:
         return self.__round(self.info.convert(v))
 
-    def convert_optional(self, v: Optional[float]) -> Optional[IntOrFloat]:
+    def convert_optional(self, v: float | None) -> IntOrFloat | None:
         if v is None:
             return v
         return self.convert(v)
@@ -47,13 +47,13 @@ class Unit:
         return cls(info=info, ndigits=info.default_ndigits)
 
     @classmethod
-    def default(cls, measurement: Type[Measurement]):
+    def default(cls, measurement: type[Measurement]):
         return cls.from_unit_info(measurement.default())
 
     @classmethod
-    def from_dict(cls, measurement: Type[Measurement], data):
+    def from_dict(cls, measurement: type[Measurement], data):
         info: UnitInfo
-        ndigits: Optional[int]
+        ndigits: int | None
 
         if isinstance(data, str):
             # compatibility for version 0.3.0
@@ -71,7 +71,7 @@ class Unit:
         return {"key": self.info.key, "ndigits": self.ndigits}
 
 
-def ndigits2rounding(ndigits: Optional[int]) -> str:
+def ndigits2rounding(ndigits: int | None) -> str:
     if ndigits is None:
         return "raw"
     if ndigits <= 0:
@@ -88,7 +88,7 @@ def rounding_schema(max_ndigits: int) -> vol.In:
     )
 
 
-def rounding2ndigits(rounding: str) -> Optional[int]:
+def rounding2ndigits(rounding: str) -> int | None:
     if rounding == "raw":
         return None
     return rounding.count("0")
@@ -103,7 +103,7 @@ class UnitConfig:
     rain_rate: Unit
     rainfall: Unit
 
-    def by_measurement(self, measurement: Type[Measurement]) -> Unit:
+    def by_measurement(self, measurement: type[Measurement]) -> Unit:
         return getattr(self, _UNIT_CONFIG_MEASUREMENT2KEY[measurement])
 
     def units_schema(self) -> vol.Schema:
@@ -189,7 +189,7 @@ class UnitConfig:
         return data
 
 
-_UNIT_CONFIG_KEY2MEASUREMENT: Mapping[str, Type[Measurement]] = {
+_UNIT_CONFIG_KEY2MEASUREMENT: Mapping[str, type[Measurement]] = {
     "temperature": Temperature,
     "pressure": Pressure,
     "wind_speed": WindSpeed,

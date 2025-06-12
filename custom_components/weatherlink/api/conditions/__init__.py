@@ -1,26 +1,29 @@
 import dataclasses
 import enum
 import logging
+from collections.abc import Iterable, Mapping
 from datetime import datetime
-from typing import Iterable, List, Mapping, Optional, Type, TypeVar
+from typing import TypeVar
 
 from .. import from_json
-from . import air_quality, condition, iss, lss, moisture
-from .air_quality import *
-from .condition import *
-from .iss import *
-from .lss import *
-from .moisture import *
+from .air_quality import AirQualityCondition
+from .condition import ConditionRecord, ReceiverState
+from .iss import CollectorSize, IssCondition
+from .lss import LssBarCondition, LssTempHumCondition
+from .moisture import MoistureCondition
 
 __all__ = [
     "ConditionType",
     "CurrentConditions",
     "DeviceType",
-    *air_quality.__all__,
-    *condition.__all__,
-    *iss.__all__,
-    *lss.__all__,
-    *moisture.__all__,
+    "AirQualityCondition",
+    "ReceiverState",
+    "ConditionRecord",
+    "CollectorSize",
+    "IssCondition",
+    "LssBarCondition",
+    "LssTempHumCondition",
+    "MoistureCondition",
 ]
 
 logger = logging.getLogger(__name__)
@@ -34,7 +37,7 @@ class ConditionType(enum.IntEnum):
     AirQuality = 6
     """Sent by AirLink"""
 
-    def record_class(self) -> Type["ConditionRecord"]:
+    def record_class(self) -> type["ConditionRecord"]:
         return _COND2CLS[self]
 
 
@@ -50,19 +53,19 @@ RecordT = TypeVar("RecordT", bound=ConditionRecord)
 
 
 @dataclasses.dataclass()
-class CurrentConditions(from_json.FromJson, Mapping[Type[RecordT], RecordT]):
+class CurrentConditions(from_json.FromJson, Mapping[type[RecordT], RecordT]):
     did: str
     """the device serial number as a string"""
     ts: datetime
     """the timestamp of the moment the response was generated, with a resolution of seconds.
-    
+
     If the time has not yet been synchronized from the network, this will instead measure the time in seconds since bootup.
     """
 
-    conditions: List[ConditionRecord]
+    conditions: list[ConditionRecord]
     """a list of current condition data records, one per logical sensor."""
 
-    name: Optional[str] = None
+    name: str | None = None
     """Only present for AirLink"""
 
     @classmethod
@@ -90,7 +93,7 @@ class CurrentConditions(from_json.FromJson, Mapping[Type[RecordT], RecordT]):
             name=data.get("name"),
         )
 
-    def __getitem__(self, cls: Type[RecordT]) -> RecordT:
+    def __getitem__(self, cls: type[RecordT]) -> RecordT:
         try:
             return next(cond for cond in self.conditions if isinstance(cond, cls))
         except StopIteration:
@@ -102,7 +105,7 @@ class CurrentConditions(from_json.FromJson, Mapping[Type[RecordT], RecordT]):
     def __len__(self) -> int:
         return len(self.conditions)
 
-    def get(self, cls: Type[RecordT]) -> Optional[RecordT]:
+    def get(self, cls: type[RecordT]) -> RecordT | None:
         try:
             return self[cls]
         except KeyError:
@@ -152,7 +155,7 @@ def condition_from_json(data: from_json.JsonObject, **kwargs) -> ConditionRecord
 
 def flatten_conditions(
     conditions: Iterable[from_json.JsonObject],
-) -> List[from_json.JsonObject]:
+) -> list[from_json.JsonObject]:
     cond_by_type = {}
     for cond in conditions:
         cond_type = cond[_STRUCTURE_TYPE_KEY]

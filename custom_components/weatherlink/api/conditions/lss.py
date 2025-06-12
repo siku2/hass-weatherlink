@@ -1,5 +1,4 @@
 import dataclasses
-from typing import Optional
 
 from .. import from_json
 from .condition import ConditionRecord
@@ -14,7 +13,7 @@ __all__ = [
 class LssBarCondition(ConditionRecord):
     bar_sea_level: float
     """most recent bar sensor reading with elevation adjustment **(hpa)**"""
-    bar_trend: Optional[float]
+    bar_trend: float | None
     """current 3 hour bar trend **(hpa)**"""
     bar_absolute: float
     """raw bar sensor reading **(hpa)**"""

@@ -1,5 +1,3 @@
-from typing import Optional
-
 from . import units
 from .api.conditions import CurrentConditions, MoistureCondition
 from .const import DECIMALS_LEAF_WETNESS, DECIMALS_SOIL_MOISTURE
@@ -75,7 +73,7 @@ class SoilMoistureABC(MoistureSensor, abc=True):
         return cls._moisture(c) is not None
 
     @classmethod
-    def _moisture(cls, c: MoistureCondition) -> Optional[float]:
+    def _moisture(cls, c: MoistureCondition) -> float | None:
         return getattr(c, f"moist_soil_{cls._sensor_id}")
 
     @property
@@ -116,7 +114,7 @@ class SoilTemperatureABC(MoistureSensor, abc=True):
         return cls._temp(c) is not None
 
     @classmethod
-    def _temp(cls, c: MoistureCondition) -> Optional[float]:
+    def _temp(cls, c: MoistureCondition) -> float | None:
         return getattr(c, f"temp_{cls._sensor_id}")
 
     @property
@@ -154,7 +152,7 @@ class LeafABC(MoistureSensor, abc=True):
         return cls._wet_leaf(c) is not None
 
     @classmethod
-    def _wet_leaf(cls, c: MoistureCondition) -> Optional[float]:
+    def _wet_leaf(cls, c: MoistureCondition) -> float | None:
         return getattr(c, f"wet_leaf_{cls._sensor_id}")
 
     @property

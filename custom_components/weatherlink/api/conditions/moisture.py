@@ -1,5 +1,4 @@
 import dataclasses
-from typing import Optional
 
 from .. import from_json
 from .condition import ConditionRecord, ReceiverState
@@ -12,33 +11,33 @@ __all__ = [
 @dataclasses.dataclass()
 class MoistureCondition(ConditionRecord):
     txid: int
-    rx_state: Optional[ReceiverState]
+    rx_state: ReceiverState | None
     """configured radio receiver state"""
 
-    temp_1: Optional[float]
+    temp_1: float | None
     """most recent valid soil temp slot 1"""
-    temp_2: Optional[float]
+    temp_2: float | None
     """most recent valid soil temp slot 2"""
-    temp_3: Optional[float]
+    temp_3: float | None
     """most recent valid soil temp slot 3"""
-    temp_4: Optional[float]
+    temp_4: float | None
     """most recent valid soil temp slot 4"""
 
-    moist_soil_1: Optional[float]
+    moist_soil_1: float | None
     """most recent valid soil moisture slot 1 **(|cb|)**"""
-    moist_soil_2: Optional[float]
+    moist_soil_2: float | None
     """most recent valid soil moisture slot 2 **(|cb|)**"""
-    moist_soil_3: Optional[float]
+    moist_soil_3: float | None
     """most recent valid soil moisture slot 3 **(|cb|)**"""
-    moist_soil_4: Optional[float]
+    moist_soil_4: float | None
     """most recent valid soil moisture slot 4 **(|cb|)**"""
 
-    wet_leaf_1: Optional[float]
+    wet_leaf_1: float | None
     """most recent valid leaf wetness slot 1"""
-    wet_leaf_2: Optional[float]
+    wet_leaf_2: float | None
     """most recent valid leaf wetness slot 2"""
 
-    trans_battery_flag: Optional[int]
+    trans_battery_flag: int | None
     """transmitter battery status flag"""
 
     @classmethod

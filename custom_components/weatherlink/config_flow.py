@@ -1,6 +1,6 @@
 import dataclasses
 import logging
-from typing import Any, Dict
+from typing import Any
 
 import voluptuous as vol
 from aiohttp.client_exceptions import ServerDisconnectedError
@@ -75,8 +75,8 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         )
 
     async def async_step_zeroconf(
-        self, discovery_info: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, discovery_info: dict[str, Any]
+    ) -> dict[str, Any]:
         host: str = discovery_info.host
         port: int = discovery_info.port
         try:

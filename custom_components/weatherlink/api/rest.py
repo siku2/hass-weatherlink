@@ -1,7 +1,7 @@
 import asyncio
 import dataclasses
+from collections.abc import Mapping
 from datetime import timedelta
-from typing import Mapping, Type
 
 import aiohttp
 
@@ -43,7 +43,7 @@ def raw_data_from_body(body: JsonObject) -> JsonObject:
     return body["data"]
 
 
-def parse_from_json(cls: Type[FromJsonT], body: JsonObject, **kwargs) -> FromJsonT:
+def parse_from_json(cls: type[FromJsonT], body: JsonObject, **kwargs) -> FromJsonT:
     data = raw_data_from_body(body)
     return cls.from_json(data, **kwargs)
 
@@ -61,7 +61,7 @@ class WeatherLinkRest:
         self._lock = asyncio.Lock()
 
     async def _request(
-        self, cls: Type[FromJsonT], path: str, /, *, params: Mapping[str, str] = None
+        self, cls: type[FromJsonT], path: str, /, *, params: Mapping[str, str] = None
     ) -> FromJsonT:
         # lock is needed because the WeatherLink hardware can't serve multiple clients at once
         async with self._lock:

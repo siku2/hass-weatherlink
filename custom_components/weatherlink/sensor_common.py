@@ -1,6 +1,6 @@
 import logging
 import typing
-from typing import Iterable, Iterator, List, Optional, Type, Union
+from collections.abc import Iterable, Iterator
 
 from . import WeatherLinkCoordinator, WeatherLinkEntity
 from .api.conditions import ConditionRecord, CurrentConditions
@@ -10,16 +10,16 @@ logger = logging.getLogger(__name__)
 
 
 class WeatherLinkSensor(WeatherLinkEntity):
-    _SENSORS: List[Type["WeatherLinkSensor"]] = []
+    _SENSORS: list[type["WeatherLinkSensor"]] = []
 
     @typing.overload
     def __init_subclass__(
         cls,
         *,
         sensor_name: str,
-        unit_of_measurement: Union[str, Type[Measurement], None],
-        device_class: Optional[str],
-        required_conditions: Iterable[Type[ConditionRecord]] = None,
+        unit_of_measurement: str | type[Measurement] | None,
+        device_class: str | None,
+        required_conditions: Iterable[type[ConditionRecord]] = None,
         **kwargs,
     ) -> None: ...
 
@@ -97,9 +97,7 @@ class WeatherLinkSensor(WeatherLinkEntity):
         return self._device_class
 
 
-def round_optional(
-    f: Optional[Union[int, float]], ndigits: int = None
-) -> Optional[Union[int, float]]:
+def round_optional(f: int | float | None, ndigits: int = None) -> int | float | None:
     if not f:
         return f
     return round(f, ndigits)

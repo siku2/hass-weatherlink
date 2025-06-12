@@ -1,5 +1,3 @@
-from typing import Optional
-
 from . import units
 from .api.conditions import IssCondition
 from .const import DECIMALS_HUMIDITY, DECIMALS_RADIATION, DECIMALS_UV
@@ -260,7 +258,7 @@ class WindDirection(
         }
 
     @classmethod
-    def bearing_to_dir(cls, deg: Optional[int]) -> Optional[str]:
+    def bearing_to_dir(cls, deg: int | None) -> str | None:
         if deg is None:
             return None
         return cls._DIRECTIONS[int(((deg % 360) + 11.25) / 22.5)]

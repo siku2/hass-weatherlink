@@ -1,19 +1,19 @@
 import dataclasses
-from typing import Callable, Optional, Tuple, Type, Union
+from collections.abc import Callable
 
 import voluptuous as vol
 
-FactorT = Union[Callable[[float], float], float]
+type FactorT = Callable[[float], float] | float
 
 
 @dataclasses.dataclass(unsafe_hash=True)
 class UnitInfo:
     key: str = dataclasses.field(init=False)
-    measurement: Type["Measurement"] = dataclasses.field(init=False)
+    measurement: type["Measurement"] = dataclasses.field(init=False)
 
     unit_of_measurement: str
-    default_ndigits: Optional[int]
-    factor: Optional[FactorT] = None
+    default_ndigits: int | None
+    factor: FactorT | None = None
 
     def convert(self, v: float) -> float:
         if factor := self.factor:
@@ -25,7 +25,7 @@ class UnitInfo:
 
 
 class Measurement:
-    _UNITS: Tuple[UnitInfo, ...]
+    _UNITS: tuple[UnitInfo, ...]
     _DATA_SCHEMA: vol.In
 
     def __init_subclass__(cls) -> None:
@@ -48,7 +48,7 @@ class Measurement:
         )
 
     @classmethod
-    def default(cls) -> Optional[UnitInfo]:
+    def default(cls) -> UnitInfo | None:
         return next(iter(cls._UNITS), None)
 
     @classmethod

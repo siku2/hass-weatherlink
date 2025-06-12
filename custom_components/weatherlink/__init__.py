@@ -1,7 +1,6 @@
 import asyncio
 import logging
 from datetime import timedelta
-from typing import Optional
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
@@ -52,7 +51,7 @@ class WeatherLinkCoordinator(DataUpdateCoordinator[CurrentConditions]):
     device_name: str
     device_model_name: str
 
-    __broadcast_task: Optional[asyncio.Task] = None
+    __broadcast_task: asyncio.Task | None = None
 
     def __set_broadcast_task_state(self, on: bool) -> None:
         if self.__broadcast_task:

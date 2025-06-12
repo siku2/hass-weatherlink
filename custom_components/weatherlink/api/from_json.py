@@ -1,7 +1,8 @@
 import abc
 import logging
+from collections.abc import Callable, Iterable
 from datetime import datetime
-from typing import Any, Callable, Dict, Iterable, Type, TypeVar, Union
+from typing import Any, TypeVar
 
 __all__ = [
     "FromJson",
@@ -10,7 +11,7 @@ __all__ = [
 
 logger = logging.getLogger(__name__)
 
-JsonObject = Dict[str, Any]
+JsonObject = dict[str, Any]
 
 
 FromJsonT = TypeVar("FromJsonT", bound="FromJson")
@@ -24,7 +25,7 @@ class FromJson(abc.ABC):
     def _from_json(cls, data: JsonObject, **kwargs): ...
 
     @classmethod
-    def from_json(cls: Type[FromJsonT], data: JsonObject, **kwargs) -> FromJsonT:
+    def from_json(cls: type[FromJsonT], data: JsonObject, **kwargs) -> FromJsonT:
         try:
             return cls._from_json(data, **kwargs)
         except Exception as e:
@@ -63,19 +64,19 @@ def apply_converters(d: JsonObject, **converters: Callable[[Any], Any]) -> None:
 
 
 def keys_to_datetime(d: JsonObject, *keys: str) -> None:
-    apply_converters(d, **{key: datetime.fromtimestamp for key in keys})
+    apply_converters(d, **dict.fromkeys(keys, datetime.fromtimestamp))
 
 
 def keys_to_celsius(d: JsonObject, *keys: str) -> None:
-    apply_converters(d, **{key: fahrenheit_to_celsius for key in keys})
+    apply_converters(d, **dict.fromkeys(keys, fahrenheit_to_celsius))
 
 
 def keys_to_kph(d: JsonObject, *keys: str) -> None:
-    apply_converters(d, **{key: mph_to_kph for key in keys})
+    apply_converters(d, **dict.fromkeys(keys, mph_to_kph))
 
 
 def keys_to_hpa(d: JsonObject, *keys: str) -> None:
-    apply_converters(d, **{key: in_hg_to_hpa for key in keys})
+    apply_converters(d, **dict.fromkeys(keys, in_hg_to_hpa))
 
 
 def remove_optional_keys(d: JsonObject, *keys: str) -> None:
@@ -86,7 +87,7 @@ def remove_optional_keys(d: JsonObject, *keys: str) -> None:
             continue
 
 
-def keys_from_aliases(d: JsonObject, **key_aliases: Union[str, Iterable[str]]) -> None:
+def keys_from_aliases(d: JsonObject, **key_aliases: str | Iterable[str]) -> None:
     for key, aliases in key_aliases.items():
         if key in d:
             continue

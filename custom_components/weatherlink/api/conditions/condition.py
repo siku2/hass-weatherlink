@@ -1,7 +1,6 @@
 import abc
 import dataclasses
 import enum
-from typing import Optional
 
 from ..from_json import FromJson
 
@@ -22,7 +21,7 @@ class ReceiverState(enum.IntEnum):
 
 @dataclasses.dataclass()
 class ConditionRecord(FromJson, abc.ABC):
-    lsid: Optional[int]
+    lsid: int | None
     """the numeric logic sensor identifier, or null if the device has not been registered"""
 
     def update_from(self, other: "ConditionRecord") -> None:

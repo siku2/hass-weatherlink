@@ -1,9 +1,10 @@
 import asyncio
+import contextlib
 import json
 import logging
 import time
 from datetime import timedelta
-from typing import Any, Optional, Tuple, Union
+from typing import Any
 
 from .conditions import CurrentConditions
 from .rest import WeatherLinkRest
@@ -42,17 +43,15 @@ class Protocol(asyncio.DatagramProtocol):
         logger.debug("%s connection made", self)
         self.transport = transport
 
-    def connection_lost(self, exc: Optional[Exception]) -> None:
+    def connection_lost(self, exc: Exception | None) -> None:
         logger.debug("%s connection lost with error: %s", self, exc)
         self.connection_lost_fut.set_result(exc)
 
     def __queue_put(self, item: Any) -> None:
-        try:
+        with contextlib.suppress(asyncio.QueueFull):
             self.queue.put_nowait(item)
-        except asyncio.QueueFull:
-            pass
 
-    def datagram_received(self, data: bytes, addr: Tuple[str, int]) -> None:
+    def datagram_received(self, data: bytes, addr: tuple[str, int]) -> None:
         if addr[0] != self.remote_addr:
             return
 
@@ -64,11 +63,11 @@ class Protocol(asyncio.DatagramProtocol):
 
         try:
             data = json.loads(data)
-        except Exception as exc:
+        except Exception:
             logger.exception(f"failed to parse broadcast payload from {addr}: {data}")
             return
 
-        msg: Union[CurrentConditions, BaseException]
+        msg: CurrentConditions | BaseException
         try:
             msg = CurrentConditions.from_json(data)
         except Exception as exc:
@@ -90,7 +89,7 @@ class Protocol(asyncio.DatagramProtocol):
 
         raise RuntimeError("connection closed")
 
-    async def __queue_get_raw(self) -> Union[CurrentConditions, BaseException]:
+    async def __queue_get_raw(self) -> CurrentConditions | BaseException:
         try:
             return self.queue.get_nowait()
         except asyncio.QueueEmpty:
