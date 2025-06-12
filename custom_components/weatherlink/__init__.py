@@ -19,11 +19,6 @@ from .units import UnitConfig, get_unit_config
 logger = logging.getLogger(__name__)
 
 
-async def async_setup(hass, _config):
-    hass.data[DOMAIN] = {}
-    return True
-
-
 def get_update_interval(entry: ConfigEntry) -> timedelta:
     seconds = 30.0
     try:
@@ -149,7 +144,7 @@ class WeatherLinkCoordinator(DataUpdateCoordinator[CurrentConditions]):
         self.__set_broadcast_task_state(False)
 
 
-async def setup_coordinator(hass, entry: ConfigEntry):
+async def setup_coordinator(hass: HomeAssistant, entry: ConfigEntry):
     host = entry.data["host"]
 
     coordinator = await WeatherLinkCoordinator.build(
@@ -157,7 +152,7 @@ async def setup_coordinator(hass, entry: ConfigEntry):
         WeatherLinkRest(aiohttp_client.async_get_clientsession(hass), host),
         entry,
     )
-    hass.data[DOMAIN][entry.entry_id] = coordinator
+    hass.data.setdefault(DOMAIN, {})[entry.entry_id] = coordinator
 
 
 async def async_setup_entry(hass, entry):
