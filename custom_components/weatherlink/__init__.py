@@ -70,7 +70,7 @@ class WeatherLinkCoordinator(DataUpdateCoordinator[CurrentConditions]):
             and get_listen_to_broadcasts(entry)
         )
 
-    async def __initalize(self, session: WeatherLinkRest, entry: ConfigEntry) -> None:
+    async def __initialize(self, session: WeatherLinkRest, entry: ConfigEntry) -> None:
         self.session = session
         entry.add_update_listener(self.__update_config)
 
@@ -136,7 +136,7 @@ class WeatherLinkCoordinator(DataUpdateCoordinator[CurrentConditions]):
             name="state",
             update_interval=get_update_interval(entry),
         )
-        await coordinator.__initalize(session, entry)
+        await coordinator.__initialize(session, entry)
 
         return coordinator
 
@@ -152,7 +152,8 @@ async def setup_coordinator(hass: HomeAssistant, entry: ConfigEntry):
         WeatherLinkRest(aiohttp_client.async_get_clientsession(hass), host),
         entry,
     )
-    hass.data.setdefault(DOMAIN, {})[entry.entry_id] = coordinator
+    hass.data.setdefault(DOMAIN, {})
+    hass.data[DOMAIN][entry.entry_id] = coordinator
 
 
 async def async_setup_entry(hass, entry):

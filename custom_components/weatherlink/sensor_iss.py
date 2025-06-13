@@ -5,9 +5,9 @@ from .sensor_common import WeatherLinkSensor, round_optional
 
 __all__ = [
     "IssStatus",
-    "Temperature",
+    "IssTemperature",
     "ThswIndex",
-    "Humidity",
+    "IssHumidity",
     "WindSpeed",
     "WindBearing",
     "SolarRad",
@@ -62,7 +62,7 @@ class IssStatus(
         }
 
 
-class Temperature(
+class IssTemperature(
     IssSensor,
     sensor_name="Temperature",
     unit_of_measurement=units.Temperature,
@@ -97,7 +97,7 @@ class ThswIndex(
         return self.units.temperature.convert_optional(self._iss_condition.thsw_index)
 
 
-class Humidity(
+class IssHumidity(
     IssSensor,
     sensor_name="Humidity",
     unit_of_measurement="%",
