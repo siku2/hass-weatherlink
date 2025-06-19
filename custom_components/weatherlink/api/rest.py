@@ -2,11 +2,12 @@ import asyncio
 import dataclasses
 from collections.abc import Mapping
 from datetime import timedelta
+from typing import Any, override
 
 import aiohttp
 
 from .conditions import CurrentConditions
-from .from_json import FromJson, FromJsonT, JsonObject
+from .from_json import FromJson, JsonObject
 
 EP_CURRENT_CONDITIONS = "/v1/current_conditions"
 EP_REAL_TIME = "/v1/real_time"
@@ -19,7 +20,8 @@ class RealTimeBroadcastResponse(FromJson):
     duration: float
 
     @classmethod
-    def _from_json(cls, data: JsonObject, **kwargs):
+    @override
+    def _from_json(cls, data: JsonObject, **kwargs: Any):
         return cls(**data)
 
 
@@ -32,7 +34,8 @@ class ApiError(Exception, FromJson):
         return f"{self.code}: {self.message}"
 
     @classmethod
-    def _from_json(cls, data: JsonObject, **kwargs):
+    @override
+    def _from_json(cls, data: JsonObject, **kwargs: Any):
         return cls(code=data["code"], message=data["message"])
 
 
@@ -43,7 +46,7 @@ def raw_data_from_body(body: JsonObject) -> JsonObject:
     return body["data"]
 
 
-def parse_from_json(cls: type[FromJsonT], body: JsonObject, **kwargs) -> FromJsonT:
+def parse_from_json[T: FromJson](cls: type[T], body: JsonObject, **kwargs: Any) -> T:
     data = raw_data_from_body(body)
     return cls.from_json(data, **kwargs)
 
@@ -60,9 +63,14 @@ class WeatherLinkRest:
 
         self._lock = asyncio.Lock()
 
-    async def _request(
-        self, cls: type[FromJsonT], path: str, /, *, params: Mapping[str, str] = None
-    ) -> FromJsonT:
+    async def _request[T: FromJson](
+        self,
+        cls: type[T],
+        path: str,
+        /,
+        *,
+        params: Mapping[str, str] | None = None,
+    ) -> T:
         # lock is needed because the WeatherLink hardware can't serve multiple clients at once
         async with self._lock:
             async with self.session.get(self.base_url + path, params=params) as resp:
@@ -77,6 +85,10 @@ class WeatherLinkRest:
             self.base_url + EP_REAL_TIME,
             params={"duration": int(duration.total_seconds())},
         ) as resp:
+            assert resp.connection is not None, "no connection for response"
+            assert resp.connection.transport is not None, (
+                "no transport for response connection"
+            )
             peername_raw = resp.connection.transport.get_extra_info("peername")
             if peername_raw is None:
                 raise ValueError("failed to get peername from request")

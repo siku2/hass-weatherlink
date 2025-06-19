@@ -1,9 +1,9 @@
 import dataclasses
 import enum
 import logging
-from collections.abc import Iterable, Mapping
+from collections.abc import Iterable
 from datetime import datetime
-from typing import TypeVar
+from typing import Any, Self, TypeVar, override
 
 from .. import from_json
 from .air_quality import AirQualityCondition
@@ -53,7 +53,7 @@ RecordT = TypeVar("RecordT", bound=ConditionRecord)
 
 
 @dataclasses.dataclass()
-class CurrentConditions(from_json.FromJson, Mapping[type[RecordT], RecordT]):
+class CurrentConditions(from_json.FromJson):
     did: str
     """the device serial number as a string"""
     ts: datetime
@@ -69,8 +69,9 @@ class CurrentConditions(from_json.FromJson, Mapping[type[RecordT], RecordT]):
     """Only present for AirLink"""
 
     @classmethod
-    def _from_json(cls, data: from_json.JsonObject, **kwargs):
-        conditions = []
+    @override
+    def _from_json(cls, data: from_json.JsonObject, **kwargs: Any) -> Self:
+        conditions: list[ConditionRecord] = []
         raw_conditions = flatten_conditions(data["conditions"])
         for i, cond_data in enumerate(raw_conditions):
             try:
@@ -93,17 +94,15 @@ class CurrentConditions(from_json.FromJson, Mapping[type[RecordT], RecordT]):
             name=data.get("name"),
         )
 
-    def __getitem__(self, cls: type[RecordT]) -> RecordT:
+    def __getitem__[T: ConditionRecord](self, cls: type[T]) -> T:
         try:
             return next(cond for cond in self.conditions if isinstance(cond, cls))
         except StopIteration:
             raise KeyError(repr(cls.__qualname__)) from None
 
-    def __iter__(self) -> Iterable[ConditionRecord]:
-        return iter(self.conditions)
-
-    def __len__(self) -> int:
-        return len(self.conditions)
+    def __contains__(self, cls: type[ConditionRecord]) -> bool:
+        """Check if a condition of the given class is present in the current conditions."""
+        return any(isinstance(cond, cls) for cond in self.conditions)
 
     def get(self, cls: type[RecordT]) -> RecordT | None:
         try:
@@ -126,7 +125,7 @@ class CurrentConditions(from_json.FromJson, Mapping[type[RecordT], RecordT]):
         return f"{model_name} {self.did}"
 
     def update_from(self, other: "CurrentConditions") -> None:
-        for other_condition in other:
+        for other_condition in other.conditions:
             condition_cls = type(other_condition)
             try:
                 condition: ConditionRecord = self[condition_cls]
@@ -138,7 +137,7 @@ class CurrentConditions(from_json.FromJson, Mapping[type[RecordT], RecordT]):
 
 _STRUCTURE_TYPE_KEY = "data_structure_type"
 
-_COND2CLS = {
+_COND2CLS: dict[ConditionType, type[ConditionRecord]] = {
     ConditionType.Iss: IssCondition,
     ConditionType.Moisture: MoistureCondition,
     ConditionType.LssBar: LssBarCondition,
@@ -147,7 +146,7 @@ _COND2CLS = {
 }
 
 
-def condition_from_json(data: from_json.JsonObject, **kwargs) -> ConditionRecord:
+def condition_from_json(data: from_json.JsonObject, **kwargs: Any) -> ConditionRecord:
     cond_ty = ConditionType(data.pop(_STRUCTURE_TYPE_KEY))
     cls = cond_ty.record_class()
     return cls.from_json(data, **kwargs)
@@ -156,9 +155,9 @@ def condition_from_json(data: from_json.JsonObject, **kwargs) -> ConditionRecord
 def flatten_conditions(
     conditions: Iterable[from_json.JsonObject],
 ) -> list[from_json.JsonObject]:
-    cond_by_type = {}
+    cond_by_type: dict[int, from_json.JsonObject] = {}
     for cond in conditions:
-        cond_type = cond[_STRUCTURE_TYPE_KEY]
+        cond_type: int = cond[_STRUCTURE_TYPE_KEY]
         try:
             existing = cond_by_type[cond_type]
         except KeyError:

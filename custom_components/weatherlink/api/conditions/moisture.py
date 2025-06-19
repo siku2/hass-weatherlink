@@ -1,4 +1,5 @@
 import dataclasses
+from typing import Any
 
 from .. import from_json
 from .condition import ConditionRecord, ReceiverState
@@ -41,7 +42,7 @@ class MoistureCondition(ConditionRecord):
     """transmitter battery status flag"""
 
     @classmethod
-    def _from_json(cls, data: from_json.JsonObject, **kwargs):
+    def _from_json(cls, data: from_json.JsonObject, **kwargs: Any):
         from_json.apply_converters(data, rx_state=ReceiverState)
         from_json.keys_to_celsius(data, "temp_1", "temp_2", "temp_3", "temp_4")
         return cls(**data)

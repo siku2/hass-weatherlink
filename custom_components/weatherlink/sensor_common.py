@@ -19,8 +19,8 @@ class WeatherLinkSensor(WeatherLinkEntity):
         sensor_name: str,
         unit_of_measurement: str | type[Measurement] | None,
         device_class: str | None,
-        required_conditions: Iterable[type[ConditionRecord]] = None,
-        **kwargs,
+        required_conditions: Iterable[type[ConditionRecord]] | None = None,
+        **kwargs: typing.Any,
     ) -> None: ...
 
     @typing.overload
@@ -28,13 +28,13 @@ class WeatherLinkSensor(WeatherLinkEntity):
         cls,
         *,
         abc: bool,
-        **kwargs,
+        **kwargs: typing.Any,
     ) -> None: ...
 
     def __init_subclass__(
         cls,
         abc: bool = False,
-        **kwargs,
+        **kwargs: typing.Any,
     ) -> None:
         if abc:
             super().__init_subclass__(**kwargs)
@@ -50,11 +50,12 @@ class WeatherLinkSensor(WeatherLinkEntity):
         cls._sensor_name = sensor_name
         cls._unit_of_measurement = unit_of_measurement
         cls._device_class = device_class
+
+        requirements: tuple[type[ConditionRecord], ...]
         try:
-            requirements = cls._required_conditions
+            requirements = getattr(cls, "_required_conditions")
         except AttributeError:
             requirements = ()
-
         cls._required_conditions = requirements + tuple(required_conditions)
 
         cls._SENSORS.append(cls)
@@ -97,7 +98,9 @@ class WeatherLinkSensor(WeatherLinkEntity):
         return self._device_class
 
 
-def round_optional(f: int | float | None, ndigits: int = None) -> int | float | None:
+def round_optional(
+    f: int | float | None, ndigits: int | None = None
+) -> int | float | None:
     if not f:
         return f
     return round(f, ndigits)

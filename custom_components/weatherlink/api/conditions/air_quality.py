@@ -1,5 +1,6 @@
 import dataclasses
 from datetime import datetime
+from typing import Any, override
 
 from .. import from_json
 from .condition import ConditionRecord
@@ -67,7 +68,8 @@ class AirQualityCondition(ConditionRecord):
     """amount of PM data available to calculate averages in the last 12 hours (rounded down to the nearest percent)"""
 
     @classmethod
-    def _from_json(cls, data: from_json.JsonObject, **kwargs):
+    @override
+    def _from_json(cls, data: from_json.JsonObject, **kwargs: Any):
         from_json.keys_to_celsius(data, "temp", "dew_point", "wet_bulb", "heat_index")
         from_json.keys_to_datetime(data, "last_report_time")
         return cls(**data)

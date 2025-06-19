@@ -1,6 +1,7 @@
 import dataclasses
 import enum
 from datetime import datetime
+from typing import Any, override
 
 from .. import from_json
 from .condition import ConditionRecord, ReceiverState
@@ -22,11 +23,9 @@ class CollectorSize(enum.IntEnum):
     Inches0001 = 4
     """(0.001")"""
 
-    def __mul__(self, x: int) -> int:
-        return x * self.to_mm()
-
-    def to_mm(self) -> float:
-        return _COLLECTOR2MM[self]
+    def to_mm(self, value: float | None) -> float:
+        mul = _COLLECTOR2MM[self]
+        return value * mul if value is not None else mul
 
 
 @dataclasses.dataclass()
@@ -141,7 +140,8 @@ class IssCondition(ConditionRecord):
     """timestamp of last rain storm end **(sec)**"""
 
     @classmethod
-    def _from_json(cls, data: from_json.JsonObject, **kwargs):
+    @override
+    def _from_json(cls, data: from_json.JsonObject, **kwargs: Any):
         collector = CollectorSize(data["rain_size"])
         data["rain_size"] = collector
         from_json.keys_from_aliases(
@@ -208,4 +208,4 @@ def keys_counts_to_mm(d: from_json.JsonObject, collector: CollectorSize, *keys: 
         counts = d.get(key)
         d[f"{key}_counts"] = counts
         if counts:
-            d[key] = collector * counts
+            d[key] = collector.to_mm(counts)

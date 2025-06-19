@@ -1,3 +1,7 @@
+from homeassistant.config_entries import ConfigEntry
+from homeassistant.core import HomeAssistant
+from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
+
 from . import WeatherLinkCoordinator, units
 from .api.conditions import LssBarCondition, LssTempHumCondition
 from .const import DECIMALS_HUMIDITY, DOMAIN
@@ -53,7 +57,11 @@ __all__ = [
 ]
 
 
-async def async_setup_entry(hass, entry, async_add_entities):
+async def async_setup_entry(
+    hass: HomeAssistant,
+    entry: ConfigEntry,
+    async_add_entities: AddConfigEntryEntitiesCallback,
+) -> bool:
     c: WeatherLinkCoordinator = hass.data[DOMAIN][entry.entry_id]
     async_add_entities(list(WeatherLinkSensor.iter_sensors_for_coordinator(c)))
     return True

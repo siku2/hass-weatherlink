@@ -2,7 +2,7 @@ import abc
 import logging
 from collections.abc import Callable, Iterable
 from datetime import datetime
-from typing import Any, TypeVar
+from typing import Any, Self
 
 __all__ = [
     "FromJson",
@@ -11,10 +11,7 @@ __all__ = [
 
 logger = logging.getLogger(__name__)
 
-JsonObject = dict[str, Any]
-
-
-FromJsonT = TypeVar("FromJsonT", bound="FromJson")
+type JsonObject = dict[str, Any]
 
 
 class FromJson(abc.ABC):
@@ -22,10 +19,10 @@ class FromJson(abc.ABC):
 
     @classmethod
     @abc.abstractmethod
-    def _from_json(cls, data: JsonObject, **kwargs): ...
+    def _from_json(cls, data: JsonObject, **kwargs: Any) -> Self: ...
 
     @classmethod
-    def from_json(cls: type[FromJsonT], data: JsonObject, **kwargs) -> FromJsonT:
+    def from_json(cls, data: JsonObject, **kwargs: Any) -> Self:
         try:
             return cls._from_json(data, **kwargs)
         except Exception as e:
@@ -33,7 +30,7 @@ class FromJson(abc.ABC):
                 logger.error(
                     f"failed to create `{cls.__qualname__}` from JSON: {data!r}"
                 )
-                e._handled = True
+                setattr(e, "_handled", True)
 
             raise e from None
 

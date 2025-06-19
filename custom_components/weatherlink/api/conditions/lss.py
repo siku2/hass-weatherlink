@@ -1,4 +1,5 @@
 import dataclasses
+from typing import Any
 
 from .. import from_json
 from .condition import ConditionRecord
@@ -19,7 +20,7 @@ class LssBarCondition(ConditionRecord):
     """raw bar sensor reading **(hpa)**"""
 
     @classmethod
-    def _from_json(cls, data: from_json.JsonObject, **kwargs):
+    def _from_json(cls, data: from_json.JsonObject, **kwargs: Any):
         from_json.keys_to_hpa(data, "bar_sea_level", "bar_trend", "bar_absolute")
         return cls(**data)
 
@@ -36,6 +37,6 @@ class LssTempHumCondition(ConditionRecord):
     """"""
 
     @classmethod
-    def _from_json(cls, data: from_json.JsonObject, **kwargs):
+    def _from_json(cls, data: from_json.JsonObject, **kwargs: Any):
         from_json.keys_to_celsius(data, "temp_in", "dew_point_in", "heat_index_in")
         return cls(**data)

@@ -4,7 +4,7 @@ import json
 import logging
 import time
 from datetime import timedelta
-from typing import Any
+from typing import Any, override
 
 from .conditions import CurrentConditions
 from .rest import WeatherLinkRest
@@ -16,8 +16,8 @@ class Protocol(asyncio.DatagramProtocol):
     remote_addr: str
 
     transport: asyncio.DatagramTransport
-    queue: asyncio.Queue
-    connection_lost_fut: asyncio.Future
+    queue: asyncio.Queue[CurrentConditions | BaseException]
+    connection_lost_fut: asyncio.Future[Exception | None]
 
     def __init__(self, remote_addr: str, *, queue_size: int = 16) -> None:
         super().__init__()
@@ -31,7 +31,7 @@ class Protocol(asyncio.DatagramProtocol):
         return f"<{type(self).__qualname__} {self.remote_addr=!r}>"
 
     @classmethod
-    async def open(cls, remote_addr: str, *, addr: str, port: int, **kwargs):
+    async def open(cls, remote_addr: str, *, addr: str, port: int, **kwargs: Any):
         loop = asyncio.get_running_loop()
         _, protocol = await loop.create_datagram_endpoint(
             lambda: cls(remote_addr, **kwargs),
@@ -47,10 +47,11 @@ class Protocol(asyncio.DatagramProtocol):
         logger.debug("%s connection lost with error: %s", self, exc)
         self.connection_lost_fut.set_result(exc)
 
-    def __queue_put(self, item: Any) -> None:
+    def __queue_put(self, item: CurrentConditions | BaseException) -> None:
         with contextlib.suppress(asyncio.QueueFull):
             self.queue.put_nowait(item)
 
+    @override
     def datagram_received(self, data: bytes, addr: tuple[str, int]) -> None:
         if addr[0] != self.remote_addr:
             return
@@ -62,14 +63,14 @@ class Protocol(asyncio.DatagramProtocol):
             return
 
         try:
-            data = json.loads(data)
+            parsed_data = json.loads(data)
         except Exception:
             logger.exception(f"failed to parse broadcast payload from {addr}: {data}")
             return
 
         msg: CurrentConditions | BaseException
         try:
-            msg = CurrentConditions.from_json(data)
+            msg = CurrentConditions.from_json(parsed_data)
         except Exception as exc:
             msg = exc
 
