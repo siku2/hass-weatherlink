@@ -105,29 +105,41 @@ class WeatherLinkCoordinator(DataUpdateCoordinator[CurrentConditions]):
 
         return conditions
 
-    async def __broadcast_loop_once(self, broadcast: WeatherLinkBroadcast) -> None:
-        logger.debug("received broadcast conditions")
-        conditions = await broadcast.read()
-        self.data.update_from(conditions)
-
-        # TODO theoretically this only needs to update sensors which actually make use of the live data
-        # notify all listeners without resetting the polling interval
-        self.async_update_listeners()
-
     async def __broadcast_loop(self) -> None:
-        try:
-            broadcast = await WeatherLinkBroadcast.start(self.session)
-        except Exception:
-            logger.exception("failed to start broadcast")
-            return
+        broadcast: WeatherLinkBroadcast | None = None
         try:
             while True:
+                if broadcast is None:
+                    try:
+                        broadcast = await WeatherLinkBroadcast.start(self.session)
+                    except Exception:
+                        logger.exception("failed to start broadcast")
+                        await asyncio.sleep(FAIL_TIMEOUT)
+                        continue
+
                 try:
-                    await self.__broadcast_loop_once(broadcast)
+                    conditions = await broadcast.read()
+                    if logger.isEnabledFor(logging.DEBUG):
+                        condition_types = {
+                            cond.__class__.__name__ for cond in conditions.conditions
+                        }
+                        logger.debug(
+                            "received broadcast conditions from %s (%s): %s",
+                            conditions.did,
+                            conditions.ts,
+                            condition_types,
+                        )
+                    self.data.update_from(conditions)
+
+                    # TODO theoretically this only needs to update sensors which actually make use of the live data
+                    # notify all listeners without resetting the polling interval
+                    self.async_update_listeners()
                 except Exception:
                     logger.exception("failed to read broadcast")
+                    await asyncio.sleep(FAIL_TIMEOUT)
         finally:
-            await broadcast.stop()
+            if broadcast:
+                await broadcast.stop()
 
     @classmethod
     async def build(
