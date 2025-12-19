@@ -2,7 +2,7 @@
     "name": "WeatherLink",
     "filename": "weatherlink.zip",
     "hide_default_branch": true,
-    "homeassistant": "2025.4.4",
+    "homeassistant": "2025.12.3",
     "render_readme": true,
     "zip_release": true
 }
