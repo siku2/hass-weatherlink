@@ -1,4 +1,4 @@
-from homeassistant.components.sensor import SensorDeviceClass
+from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
 from homeassistant.const import (
     DEGREE,
     PERCENTAGE,
@@ -76,6 +76,7 @@ class IssTemperature(
     sensor_name="Temperature",
     unit_of_measurement=UnitOfTemperature.CELSIUS,
     device_class=SensorDeviceClass.TEMPERATURE,
+    state_class=SensorStateClass.MEASUREMENT,
 ):
     @property
     def state(self):
@@ -99,6 +100,7 @@ class ThswIndex(
     sensor_name="THSW index",
     unit_of_measurement=UnitOfTemperature.CELSIUS,
     device_class=SensorDeviceClass.TEMPERATURE,
+    state_class=SensorStateClass.MEASUREMENT,
 ):
     @property
     def state(self):
@@ -110,6 +112,7 @@ class IssHumidity(
     sensor_name="Humidity",
     unit_of_measurement=PERCENTAGE,
     device_class=SensorDeviceClass.HUMIDITY,
+    state_class=SensorStateClass.MEASUREMENT,
 ):
     @property
     def state(self):
@@ -121,6 +124,7 @@ class WindSpeed(
     sensor_name="Wind speed",
     unit_of_measurement=UnitOfSpeed.KILOMETERS_PER_HOUR,
     device_class=SensorDeviceClass.WIND_SPEED,
+    state_class=SensorStateClass.MEASUREMENT,
 ):
     @property
     def icon(self):
@@ -143,6 +147,7 @@ class WindSpeedNow(
     sensor_name="Wind speed last",
     unit_of_measurement=UnitOfSpeed.KILOMETERS_PER_HOUR,
     device_class=SensorDeviceClass.WIND_SPEED,
+    state_class=SensorStateClass.MEASUREMENT,
 ):
     @property
     def icon(self):
@@ -158,6 +163,7 @@ class WindMaxSpeed(
     sensor_name="Wind max speed",
     unit_of_measurement=UnitOfSpeed.KILOMETERS_PER_HOUR,
     device_class=SensorDeviceClass.WIND_SPEED,
+    state_class=SensorStateClass.MEASUREMENT,
 ):
     @property
     def icon(self):
@@ -180,6 +186,7 @@ class WindBearing(
     sensor_name="Wind bearing",
     unit_of_measurement=DEGREE,
     device_class=SensorDeviceClass.WIND_DIRECTION,
+    state_class=SensorStateClass.MEASUREMENT_ANGLE,
 ):
     @property
     def icon(self):
@@ -204,6 +211,7 @@ class WindBearingNow(
     sensor_name="Wind bearing last",
     unit_of_measurement=DEGREE,
     device_class=SensorDeviceClass.WIND_DIRECTION,
+    state_class=SensorStateClass.MEASUREMENT_ANGLE,
 ):
     @property
     def icon(self):
@@ -269,6 +277,7 @@ class SolarRad(
     sensor_name="Solar rad",
     unit_of_measurement=UnitOfIrradiance.WATTS_PER_SQUARE_METER,
     device_class=SensorDeviceClass.IRRADIANCE,
+    state_class=SensorStateClass.MEASUREMENT,
 ):
     @property
     def icon(self):
@@ -284,6 +293,7 @@ class UvIndex(
     sensor_name="UV index",
     unit_of_measurement=None,
     device_class=None,
+    state_class=SensorStateClass.MEASUREMENT,
 ):
     @property
     def icon(self):
@@ -299,6 +309,7 @@ class RainRate(
     sensor_name="Rain rate",
     unit_of_measurement=UnitOfVolumetricFlux.MILLIMETERS_PER_HOUR,
     device_class=SensorDeviceClass.PRECIPITATION_INTENSITY,
+    state_class=SensorStateClass.MEASUREMENT,
 ):
     @property
     def icon(self):
@@ -322,6 +333,7 @@ class Rainfall(
     sensor_name="Rainfall",
     unit_of_measurement=UnitOfPrecipitationDepth.MILLIMETERS,
     device_class=SensorDeviceClass.PRECIPITATION,
+    state_class=SensorStateClass.MEASUREMENT,
 ):
     @property
     def icon(self):
@@ -348,10 +360,15 @@ class Rainstorm(
     sensor_name="Rainstorm",
     unit_of_measurement=UnitOfPrecipitationDepth.MILLIMETERS,
     device_class=SensorDeviceClass.PRECIPITATION,
+    state_class=SensorStateClass.TOTAL,
 ):
     @property
     def icon(self):
         return "mdi:weather-lightning-rainy"
+
+    @property
+    def last_reset(self):
+        return self._iss_condition.rain_storm_start_at
 
     @property
     def state(self):

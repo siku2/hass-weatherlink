@@ -1,4 +1,4 @@
-from homeassistant.components.sensor import SensorDeviceClass
+from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
 from homeassistant.const import PERCENTAGE, UnitOfTemperature
 
 from .api.conditions import CurrentConditions, MoistureCondition
@@ -60,6 +60,7 @@ class SoilMoistureABC(MoistureSensor, abc=True):
             sensor_name=f"Soil Moisture {sensor_id}",
             unit_of_measurement="cb",
             device_class=None,
+            state_class=SensorStateClass.MEASUREMENT,
             **kwargs,
         )
 

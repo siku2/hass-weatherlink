@@ -1,4 +1,4 @@
-from homeassistant.components.sensor import SensorDeviceClass
+from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import PERCENTAGE, UnitOfPressure, UnitOfTemperature
 from homeassistant.core import HomeAssistant
@@ -74,6 +74,7 @@ class Pressure(
     sensor_name="Pressure",
     unit_of_measurement=UnitOfPressure.HPA,
     device_class=SensorDeviceClass.PRESSURE,
+    state_class=SensorStateClass.MEASUREMENT,
     required_conditions=(LssBarCondition,),
 ):
     @property
@@ -98,6 +99,7 @@ class InsideTemp(
     sensor_name="Inside Temperature",
     unit_of_measurement=UnitOfTemperature.CELSIUS,
     device_class=SensorDeviceClass.TEMPERATURE,
+    state_class=SensorStateClass.MEASUREMENT,
     required_conditions=(LssTempHumCondition,),
 ):
     @property
@@ -122,6 +124,7 @@ class InsideHum(
     sensor_name="Inside Humidity",
     unit_of_measurement=PERCENTAGE,
     device_class=SensorDeviceClass.HUMIDITY,
+    state_class=SensorStateClass.MEASUREMENT,
     required_conditions=(LssTempHumCondition,),
 ):
     @property

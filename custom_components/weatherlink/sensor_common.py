@@ -2,7 +2,11 @@ import logging
 import typing
 from collections.abc import Iterable, Iterator
 
-from homeassistant.components.sensor import SensorDeviceClass, SensorEntity
+from homeassistant.components.sensor import (
+    SensorDeviceClass,
+    SensorEntity,
+    SensorStateClass,
+)
 
 from . import WeatherLinkCoordinator, WeatherLinkEntity
 from .api.conditions import ConditionRecord, CurrentConditions
@@ -21,6 +25,7 @@ class WeatherLinkSensor(WeatherLinkEntity, SensorEntity):
         unit_of_measurement: str | None,
         device_class: SensorDeviceClass | None,
         required_conditions: Iterable[type[ConditionRecord]] | None = None,
+        state_class: SensorStateClass | None = None,
         **kwargs: typing.Any,
     ) -> None: ...
 
@@ -43,8 +48,9 @@ class WeatherLinkSensor(WeatherLinkEntity, SensorEntity):
 
         sensor_name = kwargs.pop("sensor_name")
         required_conditions = kwargs.pop("required_conditions", None)
-        cls._attr_native_unit_of_measurement = kwargs.pop("unit_of_measurement")
-        cls._attr_device_class = kwargs.pop("device_class")
+        cls._attr_native_unit_of_measurement = kwargs.pop("unit_of_measurement", None)
+        cls._attr_device_class = kwargs.pop("device_class", None)
+        cls._attr_state_class = kwargs.pop("state_class", None)
 
         super().__init_subclass__(**kwargs)
 
