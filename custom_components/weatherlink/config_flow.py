@@ -10,7 +10,6 @@ from homeassistant.helpers import config_validation as cv
 
 from .api import WeatherLinkRest
 from .const import DOMAIN
-from .units import UnitConfig, get_unit_config
 
 logger = logging.getLogger(__name__)
 
@@ -34,7 +33,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     def async_get_options_flow(
         config_entry: config_entries.ConfigEntry,
     ) -> config_entries.OptionsFlow:
-        return OptionsFlow(config_entry)
+        return OptionsFlow()
 
     async def discover(self, host: str) -> dict:
         logger.info("discovering: %s", host)
@@ -99,16 +98,10 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
 
 class OptionsFlow(config_entries.OptionsFlow):
-    config_entry: config_entries.ConfigEntry
-    options: dict
-    units_config: dict
-
-    def __init__(self, config_entry: config_entries.ConfigEntry) -> None:
-        super().__init__()
-        self.config_entry = config_entry
-        self.options = dict(config_entry.options)
+    options: dict[str, Any]
 
     async def async_step_init(self, user_input=None):
+        self.options = dict(self.config_entry.options)
         return await self.async_step_misc()
 
     async def async_step_misc(self, user_input=None):
@@ -126,7 +119,7 @@ class OptionsFlow(config_entries.OptionsFlow):
             except vol.Error:
                 errors["update_interval"] = "invalid_time_period"
             else:
-                return await self.async_step_units()
+                return await self.finish()
 
         return self.async_show_form(
             step_id="misc",
@@ -143,27 +136,6 @@ class OptionsFlow(config_entries.OptionsFlow):
                 }
             ),
             errors=errors,
-        )
-
-    async def async_step_units(self, user_input=None):
-        if user_input is not None:
-            self.units_config = user_input
-            return await self.async_step_rounding()
-
-        return self.async_show_form(
-            step_id="units",
-            data_schema=get_unit_config(self.hass, self.config_entry).units_schema(),
-        )
-
-    async def async_step_rounding(self, user_input=None):
-        if user_input is not None:
-            config = UnitConfig.from_config_flow(self.units_config, user_input)
-            self.options["units"] = config.as_dict()
-            return await self.finish()
-
-        return self.async_show_form(
-            step_id="rounding",
-            data_schema=get_unit_config(self.hass, self.config_entry).rounding_schema(),
         )
 
     async def finish(self):

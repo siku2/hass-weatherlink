@@ -2,6 +2,7 @@ import logging
 
 from homeassistant.components.air_quality import AirQualityEntity
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import CONCENTRATION_MICROGRAMS_PER_CUBIC_METER
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
@@ -34,16 +35,21 @@ class AirQuality(AirQualityEntity, WeatherLinkEntity):
         return self.coordinator.device_name
 
     @property
+    def unit_of_measurement(self) -> str:
+        # Statc
+        return CONCENTRATION_MICROGRAMS_PER_CUBIC_METER
+
+    @property
     def particulate_matter_2_5(self) -> float:
-        return self.units.pm.convert(self._aq_condition.pm_2p5_nowcast)
+        return self._aq_condition.pm_2p5_nowcast
 
     @property
     def particulate_matter_10(self) -> float:
-        return self.units.pm.convert(self._aq_condition.pm_10_nowcast)
+        return self._aq_condition.pm_10_nowcast
 
     @property
     def particulate_matter_0_1(self) -> float:
-        return self.units.pm.convert(self._aq_condition.pm_1)
+        return self._aq_condition.pm_1
 
     # TODO calculate AQI
     # @property

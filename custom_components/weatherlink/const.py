@@ -1,8 +1,2 @@
 DOMAIN = "weatherlink"
 PLATFORMS = ("air_quality", "sensor", "weather")
-
-DECIMALS_HUMIDITY = None
-DECIMALS_RADIATION = None
-DECIMALS_UV = 1
-DECIMALS_LEAF_WETNESS = None
-DECIMALS_SOIL_MOISTURE = None

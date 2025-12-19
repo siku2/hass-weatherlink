@@ -1,7 +1,8 @@
-from . import units
+from homeassistant.components.sensor import SensorDeviceClass
+from homeassistant.const import PERCENTAGE, UnitOfTemperature
+
 from .api.conditions import CurrentConditions, MoistureCondition
-from .const import DECIMALS_LEAF_WETNESS, DECIMALS_SOIL_MOISTURE
-from .sensor_common import WeatherLinkSensor, round_optional
+from .sensor_common import WeatherLinkSensor
 
 __all__ = ["MoistureStatus", "SOIL_MOISTURE_CLS", "SOIL_TEMPERATURE_CLS", "LEAF_CLS"]
 
@@ -82,9 +83,7 @@ class SoilMoistureABC(MoistureSensor, abc=True):
 
     @property
     def state(self):
-        return round_optional(
-            self._moisture(self._moisture_condition), DECIMALS_SOIL_MOISTURE
-        )
+        return self._moisture(self._moisture_condition)
 
 
 SOIL_MOISTURE_CLS = tuple(
@@ -98,8 +97,8 @@ class SoilTemperatureABC(MoistureSensor, abc=True):
     def __init_subclass__(cls, *, sensor_id: int, **kwargs) -> None:
         super().__init_subclass__(
             sensor_name=f"Soil Temperature {sensor_id}",
-            unit_of_measurement=units.Temperature,
-            device_class="temperature",
+            unit_of_measurement=UnitOfTemperature.CELSIUS,
+            device_class=SensorDeviceClass.TEMPERATURE,
             **kwargs,
         )
 
@@ -119,9 +118,7 @@ class SoilTemperatureABC(MoistureSensor, abc=True):
 
     @property
     def state(self):
-        return self.units.temperature.convert_optional(
-            self._temp(self._moisture_condition)
-        )
+        return self._temp(self._moisture_condition)
 
 
 SOIL_TEMPERATURE_CLS = tuple(
@@ -136,8 +133,8 @@ class LeafABC(MoistureSensor, abc=True):
     def __init_subclass__(cls, *, sensor_id: int, **kwargs) -> None:
         super().__init_subclass__(
             sensor_name=f"Leaf {sensor_id}",
-            unit_of_measurement="%",
-            device_class=None,
+            unit_of_measurement=PERCENTAGE,
+            device_class=SensorDeviceClass.MOISTURE,
             **kwargs,
         )
 
@@ -162,14 +159,12 @@ class LeafABC(MoistureSensor, abc=True):
     @property
     def state(self):
         if wetness := self._wet_leaf(self._moisture_condition):
-            return round(100.0 / 15.0 * wetness, DECIMALS_LEAF_WETNESS)
+            return 100.0 / 15.0 * wetness
         return None
 
     @property
     def extra_state_attributes(self):
-        return {
-            "raw": round_optional(self._wet_leaf(self._moisture_condition), 1),
-        }
+        return {"raw": self._wet_leaf(self._moisture_condition)}
 
 
 LEAF_CLS = tuple(type(f"Leaf{n}", (LeafABC,), {}, sensor_id=n) for n in range(1, 3))

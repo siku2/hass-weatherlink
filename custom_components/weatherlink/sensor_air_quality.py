@@ -1,8 +1,13 @@
 from datetime import datetime
 
-from . import units
+from homeassistant.components.sensor import SensorDeviceClass
+from homeassistant.const import (
+    CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
+    PERCENTAGE,
+    UnitOfTemperature,
+)
+
 from .api.conditions import AirQualityCondition
-from .const import DECIMALS_HUMIDITY
 from .sensor_common import WeatherLinkSensor
 
 __all__ = [
@@ -71,40 +76,39 @@ class AirQualityStatus(
 class Temperature(
     AirQualitySensor,
     sensor_name="Temperature",
-    unit_of_measurement=units.Temperature,
-    device_class="temperature",
+    unit_of_measurement=UnitOfTemperature.CELSIUS,
+    device_class=SensorDeviceClass.TEMPERATURE,
 ):
     @property
     def state(self):
-        return self.units.temperature.convert(self._aq_condition.temp)
+        return self._aq_condition.temp
 
     @property
     def extra_state_attributes(self):
         c = self._aq_condition
-        u = self.units.temperature
         return {
-            "dew_point": u.convert(c.dew_point),
-            "wet_bulb": u.convert(c.wet_bulb),
-            "heat_index": u.convert(c.heat_index),
+            "dew_point": c.dew_point,
+            "wet_bulb": c.wet_bulb,
+            "heat_index": c.heat_index,
         }
 
 
 class Humidity(
     AirQualitySensor,
     sensor_name="Humidity",
-    unit_of_measurement="%",
-    device_class="humidity",
+    unit_of_measurement=PERCENTAGE,
+    device_class=SensorDeviceClass.HUMIDITY,
 ):
     @property
     def state(self):
-        return round(self._aq_condition.hum, DECIMALS_HUMIDITY)
+        return self._aq_condition.hum
 
 
 class Pm1p0(
     AirQualitySensor,
     sensor_name="PM 1.0",
-    unit_of_measurement=units.Pm,
-    device_class=None,
+    unit_of_measurement=CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
+    device_class=SensorDeviceClass.PM1,
 ):
     @property
     def icon(self):
@@ -112,14 +116,14 @@ class Pm1p0(
 
     @property
     def state(self):
-        return self.units.pm.convert(self._aq_condition.pm_1)
+        return self._aq_condition.pm_1
 
 
 class Pm2p5(
     AirQualitySensor,
     sensor_name="PM 2.5",
-    unit_of_measurement=units.Pm,
-    device_class=None,
+    unit_of_measurement=CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
+    device_class=SensorDeviceClass.PM25,
 ):
     @property
     def icon(self):
@@ -127,25 +131,24 @@ class Pm2p5(
 
     @property
     def state(self):
-        return self.units.pm.convert(self._aq_condition.pm_2p5_nowcast)
+        return self._aq_condition.pm_2p5_nowcast
 
     @property
     def extra_state_attributes(self):
         c = self._aq_condition
-        u = self.units.pm
         return {
-            "1_min": u.convert(c.pm_2p5),
-            "1_hr": u.convert(c.pm_2p5_last_1_hour),
-            "3_hr": u.convert(c.pm_2p5_last_3_hours),
-            "24_hr": u.convert(c.pm_2p5_last_24_hours),
+            "1_min": c.pm_2p5,
+            "1_hr": c.pm_2p5_last_1_hour,
+            "3_hr": c.pm_2p5_last_3_hours,
+            "24_hr": c.pm_2p5_last_24_hours,
         }
 
 
 class Pm10p0(
     AirQualitySensor,
     sensor_name="PM 10.0",
-    unit_of_measurement=units.Pm,
-    device_class=None,
+    unit_of_measurement=CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
+    device_class=SensorDeviceClass.PM10,
 ):
     @property
     def icon(self):
@@ -153,15 +156,14 @@ class Pm10p0(
 
     @property
     def state(self):
-        return self.units.pm.convert(self._aq_condition.pm_10_nowcast)
+        return self._aq_condition.pm_10_nowcast
 
     @property
     def extra_state_attributes(self):
         c = self._aq_condition
-        u = self.units.pm
         return {
-            "1_min": u.convert(c.pm_10),
-            "1_hr": u.convert(c.pm_10_last_1_hour),
-            "3_hr": u.convert(c.pm_10_last_3_hours),
-            "24_hr": u.convert(c.pm_10_last_24_hours),
+            "1_min": c.pm_10,
+            "1_hr": c.pm_10_last_1_hour,
+            "3_hr": c.pm_10_last_3_hours,
+            "24_hr": c.pm_10_last_24_hours,
         }

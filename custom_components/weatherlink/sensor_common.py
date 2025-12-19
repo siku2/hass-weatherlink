@@ -2,14 +2,15 @@ import logging
 import typing
 from collections.abc import Iterable, Iterator
 
+from homeassistant.components.sensor import SensorDeviceClass, SensorEntity
+
 from . import WeatherLinkCoordinator, WeatherLinkEntity
 from .api.conditions import ConditionRecord, CurrentConditions
-from .units import Measurement
 
 logger = logging.getLogger(__name__)
 
 
-class WeatherLinkSensor(WeatherLinkEntity):
+class WeatherLinkSensor(WeatherLinkEntity, SensorEntity):
     _SENSORS: list[type["WeatherLinkSensor"]] = []
 
     @typing.overload
@@ -17,8 +18,8 @@ class WeatherLinkSensor(WeatherLinkEntity):
         cls,
         *,
         sensor_name: str,
-        unit_of_measurement: str | type[Measurement] | None,
-        device_class: str | None,
+        unit_of_measurement: str | None,
+        device_class: SensorDeviceClass | None,
         required_conditions: Iterable[type[ConditionRecord]] | None = None,
         **kwargs: typing.Any,
     ) -> None: ...
@@ -41,15 +42,13 @@ class WeatherLinkSensor(WeatherLinkEntity):
             return
 
         sensor_name = kwargs.pop("sensor_name")
-        unit_of_measurement = kwargs.pop("unit_of_measurement")
-        device_class = kwargs.pop("device_class")
         required_conditions = kwargs.pop("required_conditions", None)
+        cls._attr_native_unit_of_measurement = kwargs.pop("unit_of_measurement")
+        cls._attr_device_class = kwargs.pop("device_class")
 
         super().__init_subclass__(**kwargs)
 
         cls._sensor_name = sensor_name
-        cls._unit_of_measurement = unit_of_measurement
-        cls._device_class = device_class
 
         requirements: tuple[type[ConditionRecord], ...]
         try:
@@ -84,23 +83,3 @@ class WeatherLinkSensor(WeatherLinkEntity):
     @property
     def name(self):
         return f"{self.coordinator.device_model_name} {self._sensor_name}"
-
-    @property
-    def unit_of_measurement(self):
-        unit = self._unit_of_measurement
-        if unit is None or isinstance(unit, str):
-            return unit
-
-        return self.units.by_measurement(unit).info.unit_of_measurement
-
-    @property
-    def device_class(self):
-        return self._device_class
-
-
-def round_optional(
-    f: int | float | None, ndigits: int | None = None
-) -> int | float | None:
-    if not f:
-        return f
-    return round(f, ndigits)

@@ -15,7 +15,6 @@ from .api import CurrentConditions, WeatherLinkBroadcast, WeatherLinkRest
 from .api.conditions import DeviceType
 from .config_flow import get_listen_to_broadcasts
 from .const import DOMAIN, PLATFORMS
-from .units import UnitConfig, get_unit_config
 
 logger = logging.getLogger(__name__)
 
@@ -40,7 +39,6 @@ FAIL_TIMEOUT: float = 3.0
 
 class WeatherLinkCoordinator(DataUpdateCoordinator[CurrentConditions]):
     session: WeatherLinkRest
-    units: UnitConfig
 
     _device_type: DeviceType
     device_did: str
@@ -63,7 +61,6 @@ class WeatherLinkCoordinator(DataUpdateCoordinator[CurrentConditions]):
             self.__broadcast_task = None
 
     async def __update_config(self, hass: HomeAssistant, entry: ConfigEntry):
-        self.units = get_unit_config(hass, entry)
         self.update_interval = get_update_interval(entry)
 
         self.__set_broadcast_task_state(
@@ -189,19 +186,13 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     return True
 
 
-class WeatherLinkEntity(CoordinatorEntity):
-    coordinator: WeatherLinkCoordinator
-
+class WeatherLinkEntity(CoordinatorEntity[WeatherLinkCoordinator]):
     def __init__(self, coordinator: WeatherLinkCoordinator) -> None:
         super().__init__(coordinator)
 
     @property
     def _conditions(self) -> CurrentConditions:
         return self.coordinator.data
-
-    @property
-    def units(self) -> UnitConfig:
-        return self.coordinator.units
 
     @property
     def device_info(self) -> dr.DeviceInfo:
