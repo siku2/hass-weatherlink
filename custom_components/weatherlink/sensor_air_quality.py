@@ -48,7 +48,7 @@ class AirQualityStatus(
         return "mdi:information"
 
     @property
-    def state(self):
+    def native_value(self) -> str:
         update_interval = self.coordinator.update_interval
         if not update_interval:
             return "unknown"
@@ -81,7 +81,7 @@ class Temperature(
     state_class=SensorStateClass.MEASUREMENT,
 ):
     @property
-    def state(self):
+    def native_value(self):
         return self._aq_condition.temp
 
     @property
@@ -102,7 +102,7 @@ class Humidity(
     state_class=SensorStateClass.MEASUREMENT,
 ):
     @property
-    def state(self):
+    def native_value(self):
         return self._aq_condition.hum
 
 
@@ -118,7 +118,7 @@ class Pm1p0(
         return "mdi:air-filter"
 
     @property
-    def state(self):
+    def native_value(self):
         return self._aq_condition.pm_1
 
 
@@ -134,7 +134,7 @@ class Pm2p5(
         return "mdi:air-filter"
 
     @property
-    def state(self):
+    def native_value(self):
         return self._aq_condition.pm_2p5_nowcast
 
     @property
@@ -160,7 +160,7 @@ class Pm10p0(
         return "mdi:air-filter"
 
     @property
-    def state(self):
+    def native_value(self):
         return self._aq_condition.pm_10_nowcast
 
     @property

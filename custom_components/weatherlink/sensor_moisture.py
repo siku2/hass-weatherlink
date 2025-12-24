@@ -1,3 +1,4 @@
+from typing import Literal
 from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
 from homeassistant.const import PERCENTAGE, UnitOfTemperature
 
@@ -37,7 +38,9 @@ class MoistureStatus(
         return "mdi:information"
 
     @property
-    def state(self):
+    def native_value(
+        self,
+    ) -> None | Literal["Tracking"] | Literal["Synched"] | Literal["Scanning"]:
         rx_state = self._moisture_condition.rx_state
         if rx_state is None:
             return None
@@ -83,7 +86,7 @@ class SoilMoistureABC(MoistureSensor, abc=True):
         return "mdi:sprout"
 
     @property
-    def state(self):
+    def native_value(self):
         return self._moisture(self._moisture_condition)
 
 
@@ -118,7 +121,7 @@ class SoilTemperatureABC(MoistureSensor, abc=True):
         return getattr(c, f"temp_{cls._sensor_id}")
 
     @property
-    def state(self):
+    def native_value(self):
         return self._temp(self._moisture_condition)
 
 
@@ -158,7 +161,7 @@ class LeafABC(MoistureSensor, abc=True):
         return "mdi:leaf"
 
     @property
-    def state(self):
+    def native_value(self):
         if wetness := self._wet_leaf(self._moisture_condition):
             return 100.0 / 15.0 * wetness
         return None

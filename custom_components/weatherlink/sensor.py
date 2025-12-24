@@ -82,7 +82,7 @@ class Pressure(
         return self._conditions[LssBarCondition]
 
     @property
-    def state(self):
+    def native_value(self):
         return self._lss_bar_condition.bar_sea_level
 
     @property
@@ -107,7 +107,7 @@ class InsideTemp(
         return self._conditions[LssTempHumCondition]
 
     @property
-    def state(self):
+    def native_value(self):
         return self._lss_temp_hum_condition.temp_in
 
     @property
@@ -132,5 +132,5 @@ class InsideHum(
         return self._conditions[LssTempHumCondition]
 
     @property
-    def state(self):
+    def native_value(self):
         return self._lss_temp_hum_condition.hum_in

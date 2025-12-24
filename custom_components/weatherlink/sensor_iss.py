@@ -56,7 +56,7 @@ class IssStatus(
         return "mdi:information"
 
     @property
-    def state(self):
+    def native_value(self):
         rx_state = self._iss_condition.rx_state
         if rx_state is None:
             return None
@@ -79,7 +79,7 @@ class IssTemperature(
     state_class=SensorStateClass.MEASUREMENT,
 ):
     @property
-    def state(self):
+    def native_value(self):
         return self._iss_condition.temp
 
     @property
@@ -103,7 +103,7 @@ class ThswIndex(
     state_class=SensorStateClass.MEASUREMENT,
 ):
     @property
-    def state(self):
+    def native_value(self):
         return self._iss_condition.thsw_index
 
 
@@ -115,7 +115,7 @@ class IssHumidity(
     state_class=SensorStateClass.MEASUREMENT,
 ):
     @property
-    def state(self):
+    def native_value(self):
         return self._iss_condition.hum
 
 
@@ -131,7 +131,7 @@ class WindSpeed(
         return "mdi:weather-windy"
 
     @property
-    def state(self):
+    def native_value(self):
         return self._iss_condition.wind_speed_avg_last_2_min
 
     @property
@@ -154,7 +154,7 @@ class WindSpeedNow(
         return "mdi:weather-windy"
 
     @property
-    def state(self):
+    def native_value(self):
         return self._iss_condition.wind_speed_last
 
 
@@ -170,7 +170,7 @@ class WindMaxSpeed(
         return "mdi:weather-windy"
 
     @property
-    def state(self):
+    def native_value(self):
         return self._iss_condition.wind_speed_hi_last_2_min
 
     @property
@@ -193,7 +193,7 @@ class WindBearing(
         return "mdi:compass-rose"
 
     @property
-    def state(self):
+    def native_value(self):
         return self._iss_condition.wind_dir_scalar_avg_last_2_min
 
     @property
@@ -218,7 +218,7 @@ class WindBearingNow(
         return "mdi:compass-rose"
 
     @property
-    def state(self):
+    def native_value(self):
         return self._iss_condition.wind_dir_last
 
 
@@ -253,7 +253,7 @@ class WindDirection(
         return "mdi:compass"
 
     @property
-    def state(self):
+    def native_value(self):
         return self.bearing_to_dir(self._iss_condition.wind_dir_scalar_avg_last_2_min)
 
     @property
@@ -284,7 +284,7 @@ class SolarRad(
         return "mdi:white-balance-sunny"
 
     @property
-    def state(self):
+    def native_value(self):
         return self._iss_condition.solar_rad
 
 
@@ -300,7 +300,7 @@ class UvIndex(
         return "mdi:shield-sun"
 
     @property
-    def state(self):
+    def native_value(self):
         return self._iss_condition.uv_index
 
 
@@ -316,7 +316,7 @@ class RainRate(
         return "mdi:water"
 
     @property
-    def state(self):
+    def native_value(self):
         return self._iss_condition.rain_rate_last
 
     @property
@@ -340,7 +340,7 @@ class Rainfall(
         return "mdi:weather-pouring"
 
     @property
-    def state(self):
+    def native_value(self):
         return self._iss_condition.rainfall_daily
 
     @property
@@ -371,7 +371,7 @@ class Rainstorm(
         return self._iss_condition.rain_storm_start_at
 
     @property
-    def state(self):
+    def native_value(self):
         return self._iss_condition.rain_storm
 
     @property
