@@ -2,8 +2,8 @@ from datetime import datetime
 
 from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
 from homeassistant.const import (
-    CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
     PERCENTAGE,
+    UnitOfDensity,
     UnitOfTemperature,
 )
 
@@ -109,7 +109,7 @@ class Humidity(
 class Pm1p0(
     AirQualitySensor,
     sensor_name="PM 1.0",
-    unit_of_measurement=CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
+    unit_of_measurement=UnitOfDensity.MICROGRAMS_PER_CUBIC_METER,
     device_class=SensorDeviceClass.PM1,
     state_class=SensorStateClass.MEASUREMENT,
 ):
@@ -125,7 +125,7 @@ class Pm1p0(
 class Pm2p5(
     AirQualitySensor,
     sensor_name="PM 2.5",
-    unit_of_measurement=CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
+    unit_of_measurement=UnitOfDensity.MICROGRAMS_PER_CUBIC_METER,
     device_class=SensorDeviceClass.PM25,
     state_class=SensorStateClass.MEASUREMENT,
 ):
@@ -151,7 +151,7 @@ class Pm2p5(
 class Pm10p0(
     AirQualitySensor,
     sensor_name="PM 10.0",
-    unit_of_measurement=CONCENTRATION_MICROGRAMS_PER_CUBIC_METER,
+    unit_of_measurement=UnitOfDensity.MICROGRAMS_PER_CUBIC_METER,
     device_class=SensorDeviceClass.PM10,
     state_class=SensorStateClass.MEASUREMENT,
 ):
