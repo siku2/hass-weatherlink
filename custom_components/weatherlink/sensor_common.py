@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 
 class WeatherLinkSensor(WeatherLinkEntity, SensorEntity):
-    _SENSORS: list[type["WeatherLinkSensor"]] = []
+    _SENSORS: list[type[WeatherLinkSensor]] = []
 
     @typing.overload
     def __init_subclass__(
@@ -76,7 +76,7 @@ class WeatherLinkSensor(WeatherLinkEntity, SensorEntity):
     @classmethod
     def iter_sensors_for_coordinator(
         cls, coord: WeatherLinkCoordinator
-    ) -> Iterator["WeatherLinkSensor"]:
+    ) -> Iterator[WeatherLinkSensor]:
         for cls in cls._SENSORS:
             if not cls._conditions_ok(coord.data):
                 logger.debug(

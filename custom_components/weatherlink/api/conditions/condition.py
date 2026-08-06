@@ -24,7 +24,7 @@ class ConditionRecord(FromJson, abc.ABC):
     lsid: int | None
     """the numeric logic sensor identifier, or null if the device has not been registered"""
 
-    def update_from(self, other: "ConditionRecord") -> None:
+    def update_from(self, other: ConditionRecord) -> None:
         for key, value in dataclasses.asdict(other).items():
             if value is None:
                 continue

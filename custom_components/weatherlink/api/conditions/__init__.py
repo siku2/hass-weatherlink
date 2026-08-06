@@ -37,7 +37,7 @@ class ConditionType(enum.IntEnum):
     AirQuality = 6
     """Sent by AirLink"""
 
-    def record_class(self) -> type["ConditionRecord"]:
+    def record_class(self) -> type[ConditionRecord]:
         return _COND2CLS[self]
 
 
@@ -124,7 +124,7 @@ class CurrentConditions(from_json.FromJson):
         model_name = self.determine_device_type().name
         return f"{model_name} {self.did}"
 
-    def update_from(self, other: "CurrentConditions") -> None:
+    def update_from(self, other: CurrentConditions) -> None:
         for other_condition in other.conditions:
             condition_cls = type(other_condition)
             try:
