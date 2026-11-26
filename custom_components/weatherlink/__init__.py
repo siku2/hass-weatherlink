@@ -2,6 +2,7 @@ import asyncio
 import logging
 from datetime import timedelta
 
+from aiohttp import ClientConnectorError
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import aiohttp_client
@@ -103,16 +104,29 @@ class WeatherLinkCoordinator(DataUpdateCoordinator[CurrentConditions]):
         return conditions
 
     async def __broadcast_loop(self) -> None:
+        connection_failures = 0
         broadcast: WeatherLinkBroadcast | None = None
         try:
             while True:
                 if broadcast is None:
                     try:
                         broadcast = await WeatherLinkBroadcast.start(self.session)
+                    except ClientConnectorError as exc:
+                        connection_failures += 1
+                        if connection_failures == MAX_FAIL_COUNTER:
+                            logger.warning(
+                                "still unable to start broadcast, retrying: %s", exc
+                            )
+                        else:
+                            logger.debug("unable to start broadcast, retrying: %s", exc)
                     except Exception:
                         logger.exception("failed to start broadcast")
+
+                    if broadcast is None:
                         await asyncio.sleep(FAIL_TIMEOUT)
                         continue
+                    if connection_failures:
+                        logger.info("broadcast listener started after retry")
 
                 try:
                     conditions = await broadcast.read()
