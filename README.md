@@ -16,6 +16,10 @@ _Bringing support for Davis Instruments' [WeatherLink](https://www.davisinstrume
 4. Restart Home Assistant.
 5. Set up the integration using the UI: [![Add Integration](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=weatherlink)
 
+## Live broadcasts
+
+If the station temporarily refuses the connection to start live broadcasts, the integration retries every three seconds. After three connection failures it logs one warning and keeps retrying.
+
 ## Limitations
 
 WeatherLink groups data into multiple data structures. For instance, all the data reported by the ISS outdoor station (temperature, wind, rain, solar, etc.) is reported in a single data structure.
